@@ -18,7 +18,7 @@
 
 <img src="docs/screenshot-normal.png" alt="экран логина" width="720"/>
 
-<img src="docs/demo.gif" alt="три неверных пароля подряд" width="720"/>
+<img src="docs/demo.webp" alt="три неверных пароля подряд" width="720"/>
 
 *три неверных пароля подряд — [запись целиком](docs/demo.mp4)*
 

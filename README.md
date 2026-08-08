@@ -18,7 +18,7 @@
 
 <img src="docs/screenshot-normal.png" alt="the login screen" width="720"/>
 
-<img src="docs/demo.gif" alt="three wrong passwords in a row" width="720"/>
+<img src="docs/demo.webp" alt="three wrong passwords in a row" width="720"/>
 
 *three wrong passwords in a row — [the full recording](docs/demo.mp4)*
 
