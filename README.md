@@ -2,7 +2,12 @@
 
 # DDLC theme for SDDM
 
-**A Doki Doki Literature Club login screen — and it does not take a wrong password well** ٩(◕‿◕)۶
+**A Doki Doki Literature Club login screen** ٩(◕‿◕)۶
+
+<img src="theme/assets/sayori-sticker-calm.png" alt="Sayori" width="110"/>
+<img src="theme/assets/monika-sticker-calm.png" alt="Monika" width="110"/>
+<img src="theme/assets/natsuki-sticker-calm.png" alt="Natsuki" width="110"/>
+<img src="theme/assets/yuri-sticker-calm.png" alt="Yuri" width="110"/>
 
 ![SDDM](https://img.shields.io/badge/SDDM-Theme_API_2.0-1D99F3?style=flat)
 ![Qt](https://img.shields.io/badge/Qt-6-41CD52?style=flat&logo=qt&logoColor=white)
@@ -16,20 +21,22 @@
 
 </div>
 
-Pink dots crawl diagonally across a white background, the login panel is styled after the game's menu, four doki drift along the bottom edge and hop when the cursor comes near. Type the wrong password and the screen starts falling apart
-
-Pure QML and INI — no Nix interpolation anywhere in the theme, so it installs on any distribution with a plain `cp`. The flake is a convenience, not a requirement
+Plain QML and INI, no Nix interpolation inside the theme, so it installs on any distribution with an ordinary `cp`. Came over from **my rice, [rokokol/huix](https://github.com/rokokol/huix)**
 
 > Unaffiliated with and not endorsed by Team Salvato. The sprites and the cursor are theirs — see [ASSETS.md](ASSETS.md)
 
-## Wrong passwords accumulate
+## Failures accumulate
 
-Every failure runs a glitch of about a second — the panel shakes, RGB-split through `QtQuick.Effects`, random scanlines, flickering corrupted text — and then leaves a mark that stays
+Every wrong password runs a glitch of about a second — the panel shakes, RGB-split through `QtQuick.Effects`, random scanlines, flickering corrupted text — and leaves a mark that does not go away
+
+<div align="center">
+<img src="docs/screenshot-glitch.png" alt="the wrong-password glitch" width="720"/>
+</div>
 
 | | what changes |
 | --- | --- |
-| **1st** | film grain over the background, Sayori leaves, Yuri switches to the cut sprites, the background darkens a little |
-| **2nd** | the even dot outlines break into ragged spikes, JPEG-style compression blocks appear, Yuri turns distorted — a wrong face at rest, datamosh on hover |
+| **1st** | film grain appears, Sayori leaves, Yuri cuts, the background darkens a little |
+| **2nd** | the even dot outlines break into ragged spikes, JPEG artefacts kick in, Yuri turns distorted |
 | **3rd** | Just Monika |
 
 <div align="center">
@@ -37,7 +44,7 @@ Every failure runs a glitch of about a second — the panel shakes, RGB-split th
 <img src="docs/screenshot-just-monika.png" alt="Just Monika" width="420"/>
 </div>
 
-In the easter egg only Monika remains, sliding to the centre while everyone else fades out. The background goes black, the dots turn red, and their drift comes to a smooth stop before accelerating the other way. "Just Monika" windows open across the screen one after another — each closes on click. A successful login clears it, and so does a minute of silence
+In the easter egg only Monika remains, sliding to the centre while everyone else fades out. The background goes black, the dots turn red, and their drift comes to a smooth stop before accelerating the other way. "Just Monika" windows open across the screen one after another, each closing on click. A successful login clears it, and so does a minute of silence
 
 ## Install
 
@@ -58,7 +65,7 @@ In the easter egg only Monika remains, sliding to the centre while everyone else
 }
 ```
 
-The module installs the theme and the cursors, selects them in the greeter, and sets `QML_DISABLE_DISK_CACHE=1` — under `/nix/store` every file has mtime 1970, so Qt's QML cache happily serves the previous version of the theme forever without it
+The module installs the theme and the cursors, selects them in the greeter and sets `QML_DISABLE_DISK_CACHE=1` — under `/nix/store` every file has mtime 1970, and without it Qt's QML cache serves the previous version of the theme forever
 
 Options live under `services.displayManager.sddm.ddlc`: `cursors` (default `true`), `cursorSize`, `package` and `cursorPackage`. Enabling SDDM itself, Wayland and the compositor stay yours
 
@@ -67,12 +74,12 @@ Options live under `services.displayManager.sddm.ddlc`: `cursors` (default `true
 ```sh
 git clone https://github.com/rokokol/ddlc-sddm-theme
 cd ddlc-sddm-theme
-sudo ./install.sh --configure
+sudo ./install.sh
 ```
 
-`install.sh` copies `theme/` into `/usr/share/sddm/themes/ddlc`, builds the cursors into `/usr/share/icons/sayori-cursors` and — with `--configure` — writes `/etc/sddm.conf.d/10-ddlc.conf`. Without that flag it changes nothing outside the two directories and tells you which key to set. `--prefix` and `--no-cursors` are there too
+With no flags it does everything: copies `theme/` into `/usr/share/sddm/themes/ddlc`, copies the cursors into `/usr/share/icons/sayori-cursors` and writes `/etc/sddm.conf.d/10-ddlc.conf` selecting both. Talk it out of that with `--no-configure` (leave `/etc` alone), `--no-cursors` and `--prefix`
 
-The theme itself is a directory copy and needs nothing but SDDM with Qt6. The cursors need ImageMagick and `xcursorgen` at install time
+Nothing has to be built: the theme and the cursors are committed ready to use, so installing is a copy. ImageMagick and `xcursorgen` are only needed to regenerate the cursors from their source frames through `cursors/build-cursors.sh`
 
 ## Fonts
 
@@ -115,17 +122,17 @@ services.displayManager.sddm.ddlc.package =
 ## Preview without logging out
 
 ```sh
-nix develop   # then: preview
+nix run github:rokokol/ddlc-sddm-theme#preview
 ```
 
-or, by hand on any distribution:
+That opens the greeter in a window in `--test-mode` against the built theme. Or by hand on any distribution:
 
 ```sh
 env -u QML2_IMPORT_PATH -u QML_IMPORT_PATH -u QT_PLUGIN_PATH \
   sddm-greeter-qt6 --test-mode --theme ./theme
 ```
 
-Unsetting those three matters: the QML and plugin paths of your running session shadow the greeter's own Qt and it fails to start
+Unsetting those three matters: the QML and plugin paths of your running session shadow the greeter's own Qt and it simply does not start
 
 Test-mode has no SDDM daemon, so a real `loginFailed` never arrives — **press F8** to fake a wrong password. Three presses reach the easter egg
 
@@ -134,8 +141,8 @@ Test-mode has no SDDM daemon, so a real `loginFailed` never arrives — **press 
 ```
 theme/          Main.qml, theme.conf, metadata.desktop, components/, assets/
                 — self-contained, copy it anywhere
-cursors/        source frames + build-cursors.sh, the one implementation both
-                install.sh and the Nix derivation call
+cursors/        the prebuilt XCursor theme, its source frames and the script
+                that regenerates one from the other
 nix/            theme.nix, cursors.nix, module.nix
 ```
 
@@ -144,5 +151,3 @@ QML file names are CamelCase because in QML the file name *is* the type name
 ## Credits
 
 Doki Doki Literature Club is by [Team Salvato](https://teamsalvato.com/). This is non-commercial fan content, and the licensing of every bundled image is spelled out in [ASSETS.md](ASSETS.md). The code is MIT
-
-Extracted from [rokokol/huix](https://github.com/rokokol/huix), where it grew up

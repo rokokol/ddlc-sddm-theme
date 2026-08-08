@@ -2,7 +2,12 @@
 
 # Тема DDLC для SDDM
 
-**Экран логина в стиле Doki Doki Literature Club — и неверный пароль он воспринимает плохо** ٩(◕‿◕)۶
+**Экран логина в стиле Doki Doki Literature Club** ٩(◕‿◕)۶
+
+<img src="theme/assets/sayori-sticker-calm.png" alt="Сайори" width="110"/>
+<img src="theme/assets/monika-sticker-calm.png" alt="Моника" width="110"/>
+<img src="theme/assets/natsuki-sticker-calm.png" alt="Нацуки" width="110"/>
+<img src="theme/assets/yuri-sticker-calm.png" alt="Юри" width="110"/>
 
 ![SDDM](https://img.shields.io/badge/SDDM-Theme_API_2.0-1D99F3?style=flat)
 ![Qt](https://img.shields.io/badge/Qt-6-41CD52?style=flat&logo=qt&logoColor=white)
@@ -16,9 +21,7 @@
 
 </div>
 
-По белому фону диагонально ползут розовые кружочки, панель логина сделана в духе меню игры, внизу дрейфуют четыре doki и подпрыгивают, когда к ним подводишь курсор. Ошибись паролем — и экран начнёт разваливаться
-
-Чистый QML и INI, никакой Nix-интерполяции внутри темы, так что она ставится на любой дистрибутив обычным `cp`. Флейк тут удобство, а не требование
+Чистый QML и INI, никакой Nix-интерполяции внутри темы, так что она ставится на любой дистрибутив обычным `cp`. Но перекачевала из **моего райса [rokokol/huix](https://github.com/rokokol/huix)**
 
 > Проект не аффилирован с Team Salvato и ими не одобрен. Спрайты и курсор принадлежат им — см. [ASSETS.md](ASSETS.md)
 
@@ -26,10 +29,14 @@
 
 Каждая ошибка запускает глитч примерно на секунду — тряска панели, RGB-split через `QtQuick.Effects`, случайные сканлайны и мигающий искажённый текст — и оставляет след, который уже не уходит
 
+<div align="center">
+<img src="docs/screenshot-glitch.png" alt="глитч при неверном пароле" width="720"/>
+</div>
+
 | | что меняется |
 | --- | --- |
-| **1-я** | появляется зернистость, уходит Сайори, Юри переключается на обрезанные спрайты, фон слегка темнеет |
-| **2-я** | ровная граница кружков расходится в колючий контур, включаются JPEG-артефакты, Юри становится искажённой — жуткое лицо в покое, датамош при наведении |
+| **1-я** | появляется зернистость, уходит Сайори, Юри режет руи, фон слегка темнеет |
+| **2-я** | ровная граница кружков расходится в колючий контур, включаются JPEG-артефакты, Юри становится искажённой |
 | **3-я** | Just Monika |
 
 <div align="center">
@@ -67,12 +74,12 @@
 ```sh
 git clone https://github.com/rokokol/ddlc-sddm-theme
 cd ddlc-sddm-theme
-sudo ./install.sh --configure
+sudo ./install.sh
 ```
 
-`install.sh` копирует `theme/` в `/usr/share/sddm/themes/ddlc`, собирает курсоры в `/usr/share/icons/sayori-cursors` и с `--configure` пишет `/etc/sddm.conf.d/10-ddlc.conf`. Без этого флага он не трогает ничего за пределами двух директорий и просто говорит, какой ключ выставить. Есть ещё `--prefix` и `--no-cursors`
+Без флагов он делает всё: копирует `theme/` в `/usr/share/sddm/themes/ddlc`, собирает курсоры в `/usr/share/icons/sayori-cursors` и пишет `/etc/sddm.conf.d/10-ddlc.conf`, где выбирает тему и курсор. Отговорить можно флагами `--no-configure` (не трогать `/etc`), `--no-cursors` и `--prefix`
 
-Самой теме не нужно ничего, кроме SDDM с Qt6 — это копирование директории. Курсорам на этапе установки нужны ImageMagick и `xcursorgen`
+Собранного ничего не требуется: и тема, и курсоры лежат в репе готовыми, установка — это `cp`. ImageMagick и `xcursorgen` нужны только если менять исходные кадры курсора и пересобирать их через `cursors/build-cursors.sh`
 
 ## Шрифты
 
@@ -115,10 +122,10 @@ services.displayManager.sddm.ddlc.package =
 ## Оконный тест без выхода из сессии
 
 ```sh
-nix develop   # дальше: preview
+nix run github:rokokol/ddlc-sddm-theme#preview
 ```
 
-или руками на любом дистрибутиве:
+Откроется окно с greeter'ом в `--test-mode`, тема берётся собранная. Или руками на любом дистрибутиве:
 
 ```sh
 env -u QML2_IMPORT_PATH -u QML_IMPORT_PATH -u QT_PLUGIN_PATH \
@@ -145,4 +152,3 @@ nix/            theme.nix, cursors.nix, module.nix
 
 Doki Doki Literature Club сделана [Team Salvato](https://teamsalvato.com/). Это некоммерческий фанатский контент, лицензии всех вложенных картинок расписаны в [ASSETS.md](ASSETS.md). Код под MIT
 
-Выделено из [rokokol/huix](https://github.com/rokokol/huix), где всё это выросло
