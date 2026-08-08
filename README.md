@@ -104,7 +104,7 @@ Everything lives in the `[General]` block of `theme/theme.conf`, read from QML a
 | `iconFont` | `DepartureMono Nerd Font` | glyphs on the power buttons |
 | `bgColor` | `#FFFFFF` | background |
 | `accentPink` / `deepPink` | `#DD77BB` / `#BB5599` | borders and accents |
-| `dotColor` | `#FFE5F4` | the dots |
+| `dotColor` | `#FFDBF0` | the dots |
 | `corruptDot` | `#FF1030` | the dots in easter-egg mode |
 | `dotSpacing` / `dotRadius` | `200` / `40` | grid step and dot radius |
 | `scrollDuration` | `14000` | drift period of the background, ms |
@@ -113,7 +113,7 @@ Everything lives in the `[General]` block of `theme/theme.conf`, read from QML a
 | `textDark` / `errorRed` | `#222222` / `#D6244A` | text and errors |
 | `glitchRgbSplit` | `true` | turn off if RGB-split misbehaves on your hardware |
 
-Everything but the two corruption colours is lifted from [ddlc.moe](https://ddlc.moe/) — the dot grid is that site's own 200×200 background tile, down to the radius
+The colours are not chosen here — they come from [**ddlc-palette**](https://github.com/rokokol/ddlc-palette), which reads them off [ddlc.moe](https://ddlc.moe/) (the dot grid is that site's own 200×200 background tile, down to the radius). `theme.conf` spells them out in hex so the theme still installs without Nix, and `nix flake check` diffs the two so they cannot drift
 
 On NixOS, set them as options instead of editing the file — the module rebuilds the theme with them merged into `theme.conf`:
 

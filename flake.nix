@@ -1,16 +1,39 @@
 {
   description = "Doki Doki Literature Club theme for the SDDM login screen";
 
-  inputs.nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
+  inputs = {
+    nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
+    # Only the checks read it — theme.conf keeps literal hex so the theme installs without Nix
+    ddlc-palette.url = "github:rokokol/ddlc-palette";
+    ddlc-palette.inputs.nixpkgs.follows = "nixpkgs";
+  };
 
   outputs =
-    { self, nixpkgs }:
+    {
+      self,
+      nixpkgs,
+      ddlc-palette,
+    }:
     let
       systems = [
         "x86_64-linux"
         "aarch64-linux"
       ];
       forAllSystems = f: nixpkgs.lib.genAttrs systems (system: f nixpkgs.legacyPackages.${system});
+
+      # theme.conf key -> palette name
+      fromPalette = {
+        bgColor = "paper";
+        panelColor = "paper";
+        dotColor = "dot";
+        panelBorder = "blush";
+        accentPink = "pink";
+        deepPink = "plum";
+        okOutline = "plum";
+        textDark = "ink";
+        errorRed = "error";
+        corruptDot = "corrupt";
+      };
     in
     {
       packages = forAllSystems (pkgs: rec {
@@ -39,6 +62,25 @@
             }
           );
         };
+      });
+
+      # theme.conf and the palette repo hold the same hex twice; this is what keeps them equal
+      checks = forAllSystems (pkgs: {
+        palette-in-sync =
+          let
+            palette = ddlc-palette.lib.palette;
+            expected = nixpkgs.lib.mapAttrsToList (key: name: "${key}=${palette.${name}}") fromPalette;
+          in
+          pkgs.runCommand "palette-in-sync" { } ''
+            fail=0
+            while read -r line; do
+              grep -qxF "$line" ${./theme/theme.conf} || { echo "theme.conf: expected $line"; fail=1; }
+            done <<'LINES'
+            ${builtins.concatStringsSep "\n" expected}
+            LINES
+            [ $fail -eq 0 ] || { echo "run generate.sh in ddlc-palette, or update theme.conf"; exit 1; }
+            touch $out
+          '';
       });
 
       formatter = forAllSystems (pkgs: pkgs.nixfmt-tree);

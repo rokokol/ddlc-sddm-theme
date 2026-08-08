@@ -30,6 +30,9 @@ jobs:
           find "$icons/cursors" -type l | while read -r l; do
             test -e "$l" || { echo "dangling: $l"; exit 1; }
           done
+      # theme.conf spells the palette out in hex; this proves it still equals ddlc-palette
+      - name: palette is in sync
+        run: nix build --no-write-lock-file .#checks.x86_64-linux.palette-in-sync
       - run: nix fmt -- --ci
 
   shell:
