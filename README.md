@@ -113,7 +113,9 @@ Everything lives in the `[General]` block of `theme/theme.conf`, read from QML a
 | `textDark` / `errorRed` | `#222222` / `#D6244A` | text and errors |
 | `glitchRgbSplit` | `true` | turn off if RGB-split misbehaves on your hardware |
 
-The colours are not chosen here — they come from [**ddlc-palette**](https://github.com/rokokol/ddlc-palette), which reads them off [ddlc.moe](https://ddlc.moe/) (the dot grid is that site's own 200×200 background tile, down to the radius). `theme.conf` spells them out in hex so the theme still installs without Nix, and `nix flake check` diffs the two so they cannot drift
+`theme.conf` is **generated**, not written: `nix/theme-conf.nix` takes the colours from [**ddlc-palette**](https://github.com/rokokol/ddlc-palette), which reads them off [ddlc.moe](https://ddlc.moe/) (the dot grid is that site's own 200×200 background tile, down to the radius), and adds the keys the palette has no opinion about. The result is committed, so installing is still a `cp` on a machine without Nix
+
+To change a colour, change the palette and run `nix run .#write-theme-conf`. CI regenerates the file and diffs it against the committed one, so a hand-edit fails the build rather than quietly forking the palette
 
 On NixOS, set them as options instead of editing the file — the module rebuilds the theme with them merged into `theme.conf`:
 

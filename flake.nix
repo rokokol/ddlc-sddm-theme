@@ -21,18 +21,9 @@
       ];
       forAllSystems = f: nixpkgs.lib.genAttrs systems (system: f nixpkgs.legacyPackages.${system});
 
-      # theme.conf key -> palette name
-      fromPalette = {
-        bgColor = "paper";
-        panelColor = "paper";
-        dotColor = "dot";
-        panelBorder = "blush";
-        accentPink = "pink";
-        deepPink = "plum";
-        okOutline = "plum";
-        textDark = "ink";
-        errorRed = "error";
-        corruptDot = "corrupt";
+      themeConf = import ./nix/theme-conf.nix {
+        inherit (nixpkgs) lib;
+        palette = ddlc-palette.lib.palette;
       };
     in
     {
@@ -44,8 +35,22 @@
 
       nixosModules.default = import ./nix/module.nix { inherit self; };
 
-      # nix run .#preview — the greeter in a window, without logging out
       apps = forAllSystems (pkgs: {
+        # nix run .#write-theme-conf — regenerate the committed theme.conf from the palette
+        write-theme-conf = {
+          type = "app";
+          program = pkgs.lib.getExe (
+            pkgs.writeShellApplication {
+              name = "write-theme-conf";
+              text = ''
+                cp --no-preserve=mode ${pkgs.writeText "theme.conf" themeConf} theme/theme.conf
+                echo "wrote theme/theme.conf"
+              '';
+            }
+          );
+        };
+
+        # nix run .#preview — the greeter in a window, without logging out
         preview = {
           type = "app";
           program = pkgs.lib.getExe (
@@ -65,22 +70,15 @@
       });
 
       # theme.conf and the palette repo hold the same hex twice; this is what keeps them equal
+      # theme.conf is a generated file that has to stay committed — this is what proves it current
       checks = forAllSystems (pkgs: {
-        palette-in-sync =
-          let
-            palette = ddlc-palette.lib.palette;
-            expected = nixpkgs.lib.mapAttrsToList (key: name: "${key}=${palette.${name}}") fromPalette;
-          in
-          pkgs.runCommand "palette-in-sync" { } ''
-            fail=0
-            while read -r line; do
-              grep -qxF "$line" ${./theme/theme.conf} || { echo "theme.conf: expected $line"; fail=1; }
-            done <<'LINES'
-            ${builtins.concatStringsSep "\n" expected}
-            LINES
-            [ $fail -eq 0 ] || { echo "run generate.sh in ddlc-palette, or update theme.conf"; exit 1; }
-            touch $out
-          '';
+        theme-conf-current = pkgs.runCommand "theme-conf-current" { } ''
+          diff -u ${./theme/theme.conf} ${pkgs.writeText "theme.conf" themeConf} || {
+            echo "theme/theme.conf is stale — run: nix run .#write-theme-conf"
+            exit 1
+          }
+          touch $out
+        '';
       });
 
       formatter = forAllSystems (pkgs: pkgs.nixfmt-tree);
