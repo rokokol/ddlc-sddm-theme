@@ -24,11 +24,18 @@ stdenvNoCC.mkDerivation {
     cp -r ./. "$theme"
 
     ${lib.concatLines (
-      lib.mapAttrsToList (k: v: ''
-        grep -q '^${k}=' "$theme/theme.conf" \
-          && sed -i 's|^${k}=.*|${k}=${toString v}|' "$theme/theme.conf" \
-          || echo '${k}=${toString v}' >> "$theme/theme.conf"
-      '') settings
+      lib.mapAttrsToList (
+        k: v:
+        # INI booleans, not Nix ones — `toString true` is "1", which QML reads as false
+        let
+          val = lib.generators.mkValueStringDefault { } v;
+        in
+        ''
+          grep -q '^${k}=' "$theme/theme.conf" \
+            && sed -i 's|^${k}=.*|${k}=${val}|' "$theme/theme.conf" \
+            || echo '${k}=${val}' >> "$theme/theme.conf"
+        ''
+      ) settings
     )}
 
     runHook postInstall

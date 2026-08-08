@@ -65,14 +65,15 @@ In the easter egg only Monika remains, sliding to the centre while everyone else
   services.displayManager.sddm = {
     enable = true;
     wayland.enable = true;
-    ddlc.enable = true;
   };
+
+  ddlc.sddm.enable = true;
 }
 ```
 
 The module installs the theme and the cursors, selects them in the greeter and sets `QML_DISABLE_DISK_CACHE=1` — under `/nix/store` every file has mtime 1970, and without it Qt's QML cache serves the previous version of the theme forever
 
-Options live under `services.displayManager.sddm.ddlc`: `cursors` (default `true`), `cursorSize`, `package` and `cursorPackage`. Enabling SDDM itself, Wayland and the compositor stay yours
+Everything this project owns lives under `ddlc.sddm`: `settings`, `package`, and `cursors.{enable,package,size}`. Enabling SDDM itself, Wayland and the compositor are not ours to own, so they stay where NixOS put them
 
 ### Any other distribution
 
@@ -112,16 +113,14 @@ Everything lives in the `[General]` block of `theme/theme.conf`, read from QML a
 | `textDark` / `errorRed` | `#4A2B3A` / `#D6244A` | text and errors |
 | `glitchRgbSplit` | `true` | turn off if RGB-split misbehaves on your hardware |
 
-On NixOS, edit these through the package instead of the file:
+On NixOS, set them as options instead of editing the file — the module rebuilds the theme with them merged into `theme.conf`:
 
 ```nix
-services.displayManager.sddm.ddlc.package =
-  inputs.ddlc-sddm-theme.packages.${system}.sddm-ddlc-theme.override {
-    settings = {
-      font = "Comfortaa";
-      dotColor = "#E8D5FF";
-    };
-  };
+ddlc.sddm.settings = {
+  font = "Comfortaa";
+  dotColor = "#E8D5FF";
+  glitchRgbSplit = false;
+};
 ```
 
 ## Preview without logging out

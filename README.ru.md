@@ -65,14 +65,15 @@
   services.displayManager.sddm = {
     enable = true;
     wayland.enable = true;
-    ddlc.enable = true;
   };
+
+  ddlc.sddm.enable = true;
 }
 ```
 
 Модуль ставит тему и курсоры, выбирает их в greeter и выставляет `QML_DISABLE_DISK_CACHE=1` — в `/nix/store` у всех файлов mtime 1970, и без этого QML-кэш Qt вечно отдаёт предыдущую версию темы
 
-Опции лежат в `services.displayManager.sddm.ddlc`: `cursors` (по умолчанию `true`), `cursorSize`, `package` и `cursorPackage`. Включение самого SDDM, Wayland и выбор композитора остаются за тобой
+Всё, чем владеет этот проект, живёт в `ddlc.sddm`: `settings`, `package` и `cursors.{enable,package,size}`. Включение самого SDDM, Wayland и выбор композитора — не наши настройки, они остаются там, куда их положил NixOS
 
 ### Любой другой дистрибутив
 
@@ -112,16 +113,14 @@ sudo ./install.sh
 | `textDark` / `errorRed` | `#4A2B3A` / `#D6244A` | текст и ошибки |
 | `glitchRgbSplit` | `true` | выключить, если RGB-split глючит на конкретном железе |
 
-На NixOS это правится через пакет, а не через файл:
+На NixOS это задаётся опциями, а не правкой файла — модуль пересоберёт тему, подмешав их в `theme.conf`:
 
 ```nix
-services.displayManager.sddm.ddlc.package =
-  inputs.ddlc-sddm-theme.packages.${system}.sddm-ddlc-theme.override {
-    settings = {
-      font = "Comfortaa";
-      dotColor = "#E8D5FF";
-    };
-  };
+ddlc.sddm.settings = {
+  font = "Comfortaa";
+  dotColor = "#E8D5FF";
+  glitchRgbSplit = false;
+};
 ```
 
 ## Оконный тест без выхода из сессии
@@ -146,8 +145,8 @@ env -u QML2_IMPORT_PATH -u QML_IMPORT_PATH -u QT_PLUGIN_PATH \
 ```
 theme/          Main.qml, theme.conf, metadata.desktop, components/, assets/
                 — самодостаточно, копируется куда угодно
-cursors/        исходные кадры + build-cursors.sh, единственная реализация,
-                которую зовут и install.sh, и деривация
+cursors/        готовая XCursor-тема, её исходные кадры и скрипт,
+                который пересобирает первое из второго
 nix/            theme.nix, cursors.nix, module.nix
 ```
 

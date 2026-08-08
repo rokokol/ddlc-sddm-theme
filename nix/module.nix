@@ -1,5 +1,7 @@
 # NixOS module: point an already-enabled SDDM at the DDLC theme.
-# Enabling SDDM itself, picking Wayland and choosing the compositor stay with the consumer
+# Everything this project owns lives under `ddlc.*`; enabling SDDM itself, picking
+# Wayland and choosing the compositor stay with the consumer, under their own options.
+# Deliberately no `ddlc.enable` — a sibling flake declaring the same path would abort the eval
 { self }:
 {
   config,
@@ -9,37 +11,60 @@
 }:
 
 let
-  cfg = config.services.displayManager.sddm.ddlc;
+  cfg = config.ddlc.sddm;
   sddm = config.services.displayManager.sddm;
 in
 {
-  options.services.displayManager.sddm.ddlc = {
+  options.ddlc.sddm = {
     enable = lib.mkEnableOption "the Doki Doki Literature Club theme for SDDM";
+
+    settings = lib.mkOption {
+      type = lib.types.attrsOf (
+        lib.types.oneOf [
+          lib.types.str
+          lib.types.int
+          lib.types.bool
+        ]
+      );
+      default = { };
+      example = {
+        font = "Comfortaa";
+        dotColor = "#E8D5FF";
+      };
+      description = ''
+        Keys of the `[General]` block in `theme.conf` — see the README table.
+        Ignored if `package` is set to something built elsewhere.
+      '';
+    };
 
     package = lib.mkOption {
       type = lib.types.package;
-      default = self.packages.${pkgs.stdenv.hostPlatform.system}.sddm-ddlc-theme;
-      defaultText = lib.literalExpression "ddlc-sddm-theme.packages.\${system}.sddm-ddlc-theme";
-      description = "The theme package. Override it to change theme.conf: `package.override { settings = { font = \"Sans\"; }; }`";
+      default = self.packages.${pkgs.stdenv.hostPlatform.system}.sddm-ddlc-theme.override {
+        inherit (cfg) settings;
+      };
+      defaultText = lib.literalExpression "ddlc-sddm-theme.packages.\${system}.sddm-ddlc-theme.override { inherit settings; }";
+      description = "The theme package, built with `settings` applied";
     };
 
-    cursors = lib.mkOption {
-      type = lib.types.bool;
-      default = true;
-      description = "Install the Sayori cursor theme and use it in the greeter";
-    };
+    cursors = {
+      enable = lib.mkOption {
+        type = lib.types.bool;
+        default = true;
+        description = "Install the Sayori cursor theme and use it in the greeter";
+      };
 
-    cursorPackage = lib.mkOption {
-      type = lib.types.package;
-      default = self.packages.${pkgs.stdenv.hostPlatform.system}.sayori-cursors;
-      defaultText = lib.literalExpression "ddlc-sddm-theme.packages.\${system}.sayori-cursors";
-      description = "The cursor theme package used when `cursors` is enabled";
-    };
+      package = lib.mkOption {
+        type = lib.types.package;
+        default = self.packages.${pkgs.stdenv.hostPlatform.system}.sayori-cursors;
+        defaultText = lib.literalExpression "ddlc-sddm-theme.packages.\${system}.sayori-cursors";
+        description = "The cursor theme package";
+      };
 
-    cursorSize = lib.mkOption {
-      type = lib.types.ints.positive;
-      default = 32;
-      description = "Cursor size in the greeter";
+      size = lib.mkOption {
+        type = lib.types.ints.positive;
+        default = 32;
+        description = "Cursor size in the greeter";
+      };
     };
   };
 
@@ -47,11 +72,11 @@ in
     assertions = [
       {
         assertion = sddm.enable;
-        message = "services.displayManager.sddm.ddlc.enable needs services.displayManager.sddm.enable";
+        message = "ddlc.sddm.enable needs services.displayManager.sddm.enable";
       }
     ];
 
-    environment.systemPackages = [ cfg.package ] ++ lib.optional cfg.cursors cfg.cursorPackage;
+    environment.systemPackages = [ cfg.package ] ++ lib.optional cfg.cursors.enable cfg.cursors.package;
 
     services.displayManager.sddm = {
       theme = "ddlc";
@@ -62,9 +87,9 @@ in
         # GreeterEnvironment as one string, so a consumer appending to it would fight this
         General.GreeterEnvironment = lib.mkDefault "QT_WAYLAND_SHELL_INTEGRATION=layer-shell,QML_DISABLE_DISK_CACHE=1";
 
-        Theme = lib.mkIf cfg.cursors {
+        Theme = lib.mkIf cfg.cursors.enable {
           CursorTheme = "sayori-cursors";
-          CursorSize = cfg.cursorSize;
+          CursorSize = cfg.cursors.size;
         };
       };
     };
