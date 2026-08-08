@@ -5,7 +5,8 @@ import QtQuick
 // In easter-egg mode (frozen) the drift stops: Monika slides to the centre and
 // everyone else fades out (gone).
 // Every sticker shares one 141x173 canvas, bottom-aligned: the characters keep their relative
-// sizes, their feet line up, and nobody shrinks when a consumer scales by width instead
+// sizes, their feet line up, and nobody shrinks when a consumer scales by width instead.
+// Height comes from the owner (SpriteRow), which knows the canvas — set it, or nothing draws
 Item {
     id: sprite
 
@@ -41,7 +42,6 @@ Item {
     }
 
     width: img.width
-    height: 172
 
     opacity: gone ? 0 : 1
     Behavior on opacity {

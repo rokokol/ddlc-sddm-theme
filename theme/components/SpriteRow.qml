@@ -11,7 +11,10 @@ Item {
     // Width of the bottom corner zones: session buttons left, power right
     property real sideReserve: 240
 
-    height: 172
+    // The shared sticker canvas — rendering 1:1 keeps the sprites free of resampling
+    readonly property int spriteHeight: 173
+
+    height: spriteHeight
 
     readonly property var girls: ["sayori", "monika", "natsuki", "yuri"]
 
@@ -21,8 +24,9 @@ Item {
         model: row.girls
 
         CharacterSprite {
-            readonly property real bandW: Math.max(172, (row.width - 2 * row.sideReserve) / row.girls.length)
+            readonly property real bandW: Math.max(row.spriteHeight, (row.width - 2 * row.sideReserve) / row.girls.length)
 
+            height: row.spriteHeight
             calmSource: "../assets/" + modelData + "-sticker-calm.png"
             excitedSource: "../assets/" + modelData + "-sticker-excited.png"
             // From the 1st failure Yuri switches to the cut (-cut) sprites
