@@ -3,7 +3,9 @@ import QtQuick
 // A single character: drifts left and right inside its band [xMin, xMax], hops
 // on hover and switches to the excited sticker.
 // In easter-egg mode (frozen) the drift stops: Monika slides to the centre and
-// everyone else fades out (gone)
+// everyone else fades out (gone).
+// Every sticker shares one 141x173 canvas, bottom-aligned: the characters keep their relative
+// sizes, their feet line up, and nobody shrinks when a consumer scales by width instead
 Item {
     id: sprite
 
