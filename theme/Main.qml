@@ -1,17 +1,17 @@
 import QtQuick
 import "components"
 
-// Тема SDDM в стиле Doki Doki Literature Club.
-// Слои снизу вверх: фон с кружочками → затемнение пасхалки → часы/цитата →
-// спрайты девочек → панель логина → нижние углы → глитч поверх всего.
+// SDDM theme in the style of Doki Doki Literature Club.
+// Layers bottom to top: dot background → easter-egg darkening → clock →
+// character sprites → login panel → bottom corners → glitch over everything
 Rectangle {
     id: root
 
-    // Размеры по умолчанию для test-mode; в реальном greeter их задаёт SDDM
+    // Defaults for test-mode; in the real greeter SDDM sets the size
     width: 1280
     height: 720
 
-    // Фон реагирует на неудачи: 1-я и 2-я слегка затемняют, 3-я — чёрный
+    // The background answers failures: the 1st and 2nd darken it, the 3rd turns it black
     color: justMonika ? "black" : Qt.darker(config.bgColor, 1 + failCount * 0.13)
     Behavior on color {
         ColorAnimation {
@@ -22,11 +22,11 @@ Rectangle {
     property int failCount: 0
     readonly property bool justMonika: failCount >= 3
 
-    // Реакция на неверный пароль. Вызывается из onLoginFailed и по F8:
-    // в test-mode демона нет и sddm.loginFailed не приходит в принципе,
-    // так что глитч и пасхалку иначе не проверить.
-    // failCount++ живёт в glitch.onFinished — фазовые изменения (зерно,
-    // деформация кружков, Юри -cut/-distorted) наступают после глитча
+    // Wrong-password reaction. Called from onLoginFailed and by F8: test-mode has
+    // no daemon, so sddm.loginFailed never arrives and there would be no other way
+    // to preview the glitch and the easter egg.
+    // failCount++ lives in glitch.onFinished — the phase changes (grain, dot
+    // deformation, Yuri's -cut/-distorted sprites) land after the glitch
     function showFail() {
         forgiveTimer.restart()
         panel.clearPassword()
@@ -40,14 +40,14 @@ Rectangle {
         rough: root.failCount >= 2
     }
 
-    // Зернистость фона с 1-й неудачи
+    // Background grain from the 1st failure on
     GrainOverlay {
         anchors.fill: parent
         z: 1
         active: root.failCount >= 1
     }
 
-    // Часы
+    // Clock
     Text {
         id: clockText
 
@@ -75,7 +75,7 @@ Rectangle {
         anchors.left: parent.left
         anchors.right: parent.right
         anchors.bottom: parent.bottom
-        // Спрайты стоят над нижними кнопками и не пересекаются с ними
+        // Sprites stand above the bottom buttons and never overlap them
         anchors.bottomMargin: 88
         failCount: root.failCount
         sideReserve: Math.max(leftControls.width, rightControls.width) + 40
@@ -91,7 +91,7 @@ Rectangle {
         }
     }
 
-    // Нижний левый угол: сессия и раскладка
+    // Bottom left corner: session and keyboard layout
     Row {
         id: leftControls
 
@@ -105,8 +105,8 @@ Rectangle {
             id: sessions
         }
 
-        // Переключатель раскладки: клик листает по кругу.
-        // Прячется, если раскладок нет (например, в test-mode)
+        // Layout switch: a click cycles through them.
+        // Hidden when there are no layouts — in test-mode, for one
         Rectangle {
             readonly property bool hasLayouts: typeof keyboard !== "undefined" && keyboard.layouts.length > 0
 
@@ -144,7 +144,7 @@ Rectangle {
         }
     }
 
-    // Нижний правый угол: сон, перезагрузка, выключение
+    // Bottom right corner: suspend, reboot, power off
     Row {
         id: rightControls
 
@@ -171,7 +171,7 @@ Rectangle {
         }
     }
 
-    // Окошки Just Monika поверх всего, кроме глитча
+    // Just Monika popups above everything but the glitch
     MonikaPopups {
         z: 6
         anchors.fill: parent
@@ -184,12 +184,12 @@ Rectangle {
         z: 10
         anchors.fill: parent
         target: panel
-        // Фазовые изменения (failCount++) наступают после глитч-анимации,
-        // чтобы порча фона / смена спрайтов не перекрывались с глитчем
+        // Phase changes (failCount++) land after the glitch animation, so the
+        // background corruption and the sprite swap don't overlap it
         onFinished: root.failCount++
     }
 
-    // Пасхалка сбрасывается сама через минуту тишины
+    // The easter egg resets itself after a minute of silence
     Timer {
         id: forgiveTimer
 
@@ -209,7 +209,7 @@ Rectangle {
         }
     }
 
-    // F8 — предпросмотр глитча (три нажатия — пасхалка)
+    // F8 previews the glitch — three presses reach the easter egg
     Shortcut {
         sequence: "F8"
         context: Qt.ApplicationShortcut

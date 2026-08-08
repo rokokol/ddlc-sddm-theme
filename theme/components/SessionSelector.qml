@@ -1,8 +1,8 @@
 import QtQuick
 import QtQuick.Controls.Basic
 
-// Выбор сессии в нижнем левом углу. Список раскрывается вверх,
-// чтобы не выйти за границу экрана.
+// Session picker in the bottom left corner. The list opens upwards so it
+// doesn't run off the screen
 ComboBox {
     id: control
 
@@ -34,7 +34,7 @@ ComboBox {
     indicator: Text {
         x: control.width - width - 14
         anchors.verticalCenter: control.verticalCenter
-        text: "▴" // ▴ — список открывается вверх
+        text: "▴" // ▴ — the list opens upwards
         font.pixelSize: 13
         color: config.deepPink
     }

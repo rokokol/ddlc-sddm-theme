@@ -1,10 +1,9 @@
 import QtQuick
 import QtQuick.Effects
 
-// RGB-split для глитча: две подкрашенные копии панели логина,
-// разъехавшиеся по горизонтали. Файл грузится через Loader —
-// если QtQuick.Effects в greeter недоступен, ломается только он,
-// а не вся тема.
+// RGB-split for the glitch: two tinted copies of the login panel pulled apart
+// horizontally. The file is loaded through a Loader — if QtQuick.Effects is
+// unavailable in the greeter, only this breaks and not the whole theme
 Item {
     id: split
 

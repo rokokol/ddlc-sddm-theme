@@ -1,8 +1,8 @@
 import QtQuick
 
-// Кнопка входа: текст "OK" с толстой фиолетовой обводкой на прозрачном
-// фоне, как кнопка в игре. Обводка — восемь сдвинутых копий текста,
-// потому что Text.Outline даёт слишком тонкую линию.
+// Login button: the text "OK" with a thick purple outline on a transparent
+// background, like the button in the game. The outline is eight offset copies of
+// the text, because Text.Outline draws too thin a line
 Item {
     id: btn
 
@@ -54,7 +54,7 @@ Item {
 
         anchors.fill: parent
         hoverEnabled: true
-        // PointingHandCursor — в нашей курсорной теме это глитчнутая голова Сайори
+        // PointingHandCursor — in the bundled cursor theme that is Sayori's glitched head
         cursorShape: Qt.PointingHandCursor
         onClicked: btn.clicked()
     }

@@ -1,8 +1,8 @@
 import QtQuick
 import QtQuick.Controls.Basic
 
-// Панель логина: бледно-розовый бокс с рамкой в стиле just-monika-ok.png,
-// поля логина/пароля и картинка-кнопка "Just Monika. OK".
+// Login panel: a pale pink box with a border in the style of just-monika-ok.png,
+// the username/password fields and the "Just Monika. OK" image button
 Item {
     id: panel
 
@@ -86,7 +86,7 @@ Item {
         }
     }
 
-    // Фокус сразу в нужное поле: если логин предзаполнен — в пароль
+    // Focus lands where it is needed: on the password when the username is prefilled
     Component.onCompleted: {
         if (userField.text.length > 0)
             passwordField.forceActiveFocus()

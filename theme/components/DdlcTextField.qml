@@ -1,15 +1,14 @@
 import QtQuick
 import QtQuick.Controls.Basic
 
-// Поле ввода в стиле DDLC: белая "пилюля" с розовой рамкой,
-// при фокусе рамка темнеет.
+// A DDLC-style input: a white "pill" with a pink border that darkens on focus
 TextField {
     id: field
 
-    // Высота считается от метрик шрифта, а не от контента: иначе поле пароля
-    // меняет размер при вводе (у точек echoMode другие метрики, чем у
-    // плейсхолдера) и дёргает подложку. Так высота стабильна и сама
-    // подстраивается под смену шрифта/кегля
+    // Height comes from the font metrics, not from the content: otherwise the
+    // password field resizes as you type (echoMode dots carry different metrics
+    // than the placeholder) and jerks the backdrop. This way the height is stable
+    // and still follows a change of font or size
     FontMetrics {
         id: fm
 

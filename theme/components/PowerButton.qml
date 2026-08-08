@@ -1,7 +1,7 @@
 import QtQuick
 
-// Круглая кнопка питания/сессии в нижнем углу: белая с розовой рамкой,
-// при наведении заливается розовым и чуть подрастает.
+// Round power/session button in the bottom corner: white with a pink border,
+// fills pink and grows a little on hover
 Rectangle {
     id: btn
 

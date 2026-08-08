@@ -1,7 +1,7 @@
 import QtQuick
 
-// Глитч при неверном пароле: тряска панели, RGB-split, случайные
-// "сканлайны" и мигающий искажённый текст. Всё гаснет через ~0.8 с.
+// Wrong-password glitch: the panel shakes, RGB-split, random scanlines and
+// flickering corrupted text. All of it dies out after ~0.8 s
 Item {
     id: overlay
 
@@ -18,7 +18,7 @@ Item {
         stopTimer.restart()
     }
 
-    // Тряска панели и пересев шума каждые 40 мс
+    // Shake the panel and reseed the noise every 40 ms
     Timer {
         id: shakeTimer
 
@@ -49,8 +49,8 @@ Item {
         }
     }
 
-    // RGB-split вынесен в отдельный файл: при недоступном QtQuick.Effects
-    // сломается только этот Loader, остальной глитч продолжит работать
+    // RGB-split lives in its own file: if QtQuick.Effects is unavailable only this
+    // Loader breaks and the rest of the glitch keeps working
     Loader {
         anchors.fill: parent
         source: overlay.rgbSplit ? "RgbSplit.qml" : ""
@@ -60,7 +60,7 @@ Item {
         }
     }
 
-    // Случайные горизонтальные полосы
+    // Random horizontal scanlines
     Item {
         id: noise
 
@@ -91,8 +91,8 @@ Item {
         }
     }
 
-    // Мигающий искажённый текст: обычный глитч неверного пароля,
-    // без "Just Monika" — это отдано пасхалке с окошками
+    // Flickering corrupted text: the plain wrong-password glitch, without
+    // "Just Monika" — that one belongs to the popup easter egg
     Text {
         id: corrupt
 

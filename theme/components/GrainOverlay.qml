@@ -1,7 +1,7 @@
 import QtQuick
 
-// Зернистость/шероховатость на фоне: серый шумовой тайл поверх фона,
-// слегка дрожит для эффекта "живой" плёнки. Включается со 2-й неудачи.
+// Film grain over the background: a grey noise tile that jitters slightly for a
+// "live film" feel. Switched on by the caller from the 1st failure
 Item {
     id: grain
 
@@ -20,14 +20,14 @@ Item {
 
         source: "../assets/noise.png"
         fillMode: Image.Tile
-        // Крупнее экрана, чтобы дрожание не открывало края
+        // Larger than the screen so the jitter never exposes an edge
         x: -40
         y: -40
         width: grain.width + 80
         height: grain.height + 80
     }
 
-    // Дрожание зерна — тайл бесшовный, так что сдвиг незаметно повторяется
+    // Grain jitter — the tile is seamless, so the shift repeats invisibly
     Timer {
         interval: 70
         repeat: true

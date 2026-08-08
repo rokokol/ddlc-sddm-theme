@@ -1,7 +1,7 @@
 import QtQuick
 
-// Пасхалка: после трёх неверных паролей по экрану одно за другим
-// появляются маленькие "окошки" Just Monika. Каждое закрывается кликом
+// Easter egg: after three wrong passwords little "Just Monika" windows appear
+// across the screen one after another. Each one closes on click
 Item {
     id: popups
 
@@ -24,7 +24,7 @@ Item {
         id: cards
     }
 
-    // Удаление по уникальному id — индексы в модели съезжают при закрытии
+    // Removal by unique id — model indices shift as windows close
     function closeCid(cid) {
         for (var i = 0; i < cards.count; i++) {
             if (cards.get(i).cid === cid) {
@@ -46,7 +46,7 @@ Item {
                 stop()
                 return
             }
-            // Не залезаем на нижнюю полосу со спрайтами и кнопками
+            // Stay clear of the bottom strip with the sprites and the buttons
             cards.append({
                 cid: popups.nextId++,
                 px: 30 + Math.random() * Math.max(1, popups.width - 260),
@@ -73,7 +73,7 @@ Item {
             source: "../assets/just-monika-ok.png"
             transformOrigin: Item.Center
 
-            // Появление с лёгким "выпрыгиванием"
+            // Appears with a slight pop
             scale: 0
             NumberAnimation on scale {
                 id: appear
@@ -84,7 +84,7 @@ Item {
                 easing.type: Easing.OutBack
             }
 
-            // Закрытие по клику: окошко сжимается обратно и удаляется
+            // Click to close: the window shrinks back and is removed
             NumberAnimation {
                 id: shrink
 

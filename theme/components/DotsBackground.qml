@@ -1,22 +1,22 @@
 import QtQuick
 import QtQuick.Shapes
 
-// Фон в стиле меню DDLC: решётка кружков (чётные ряды сдвинуты на полшага)
-// ползёт по диагонали. Движение реализовано через интегрирование скорости
-// покадрово (FrameAnimation), чтобы его можно было плавно затормозить и так
-// же плавно разогнать в обратную сторону — это включает режим пасхалки.
+// The DDLC menu background: a grid of dots (odd rows offset by half a step)
+// crawling diagonally. Movement integrates velocity per frame (FrameAnimation)
+// so it can be brought to a smooth halt and accelerated back the other way just
+// as smoothly — which is what the easter-egg mode does
 Item {
     id: bg
 
     clip: true
 
-    // Режим "Just Monika": чёрный фон, красные кружки, разворот движения
+    // "Just Monika" mode: black background, red dots, reversed movement
     property bool corrupted: false
-    // Со 2-й неудачи ровная граница кружка расходится в колючий рваный контур
+    // From the 2nd failure the even dot outline breaks into a spiky, ragged contour
     property bool rough: false
 
-    // JPEG-артефакты: со 2-й неудачи слой кружков рендерится в уменьшенную
-    // текстуру и тянется nearest'ом — получаются блоки как от компрессии
+    // JPEG artefacts: from the 2nd failure the dot layer renders into a downscaled
+    // texture stretched with nearest sampling — the blocks read as compression
     layer.enabled: rough
     layer.smooth: false
     layer.textureSize: Qt.size(Math.max(1, width / 7), Math.max(1, height / 7))
@@ -27,7 +27,7 @@ Item {
     readonly property int cols: Math.ceil(width / step) + 3
     readonly property int rows: Math.ceil(height / step) + 5
 
-    // Базовая скорость (px/сек) при vel = 1; vel — множитель и знак направления
+    // Base speed (px/s) at vel = 1; vel is the multiplier and the direction sign
     readonly property real baseVel: step * 1000 / scrollMs
     property real vel: 1
     property real pos: 0
@@ -52,13 +52,13 @@ Item {
         return ((v % m) + m) % m;
     }
 
-    // Покадровый интегратор смещения
+    // Per-frame offset integrator
     FrameAnimation {
         running: true
         onTriggered: bg.pos += bg.baseVel * bg.vel * frameTime
     }
 
-    // Плавно: сначала затухание движения до нуля, затем разгон в обратную сторону
+    // Smoothly: decay the movement to zero first, then accelerate the other way
     SequentialAnimation {
         id: velAnim
 
@@ -81,15 +81,15 @@ Item {
     Item {
         id: field
 
-        // x повторяется с периодом step, y — с периодом 2·step (из-за сдвига рядов)
+        // x repeats with period step, y with 2·step — the rows are offset
         x: bg.wrapMod(bg.pos, bg.step) - bg.step
         y: bg.wrapMod(bg.pos * 2, bg.step * 2) - bg.step * 2
 
         Repeater {
             model: bg.cols * bg.rows
 
-            // Кружок как многоугольник: в норме — гладкая окружность (24-гон),
-            // при rough вершины расходятся в хаотичные колючки
+            // A dot as a polygon: a smooth circle normally, and under rough the
+            // vertices scatter into chaotic spikes
             Shape {
                 id: dot
 
@@ -97,7 +97,7 @@ Item {
                 readonly property int col: index % bg.cols
                 readonly property int verts: 26
 
-                // Стабильные случайные сиды на вершину: радиальный и угловой
+                // Stable random seeds per vertex: radial and angular
                 readonly property var seedR: {
                     var a = [];
                     for (var i = 0; i < verts; i++)
@@ -111,7 +111,7 @@ Item {
                     return a;
                 }
 
-                // Степень "колючести": 0 — окружность, 1 — рваный контур
+                // Spikiness: 0 is a circle, 1 is a ragged contour
                 property real spikiness: bg.rough ? 1 : 0
                 Behavior on spikiness {
                     NumberAnimation {
@@ -124,9 +124,9 @@ Item {
                 y: row * bg.step - bg.step * 2
                 width: bg.dotR * 2
                 height: bg.dotR * 2
-                // GeometryRenderer вместо CurveRenderer: контур из прямых
-                // сегментов, кривые не нужны — это в разы дешевле на ~100 фигур
-                // и убирает подтормаживание фона
+                // GeometryRenderer over CurveRenderer: the contour is straight
+                // segments and needs no curves — many times cheaper across ~100
+                // shapes, and it removes the background stutter
                 preferredRendererType: Shape.GeometryRenderer
                 antialiasing: true
 
@@ -136,9 +136,9 @@ Item {
                     var stepA = 2 * Math.PI / verts;
                     for (var i = 0; i <= verts; i++) {
                         var k = i % verts;
-                        // угловое дрожание вершины — контур перестаёт быть симметричным
+                        // angular jitter per vertex — the contour stops being symmetric
                         var ang = stepA * k + (seedA[k] - 0.5) * stepA * 0.9 * spikiness;
-                        // в основном мелкие вмятины, изредка длинный шип наружу
+                        // mostly small dents, occasionally a long spike outward
                         var s = seedR[k];
                         var spike = (s > 0.66) ? (0.45 + (s - 0.66) * 2.6) : (-0.22 * s);
                         var rr = bg.dotR * (1 + spike * spikiness);
@@ -153,7 +153,7 @@ Item {
                     strokeWidth: 1
 
                     PathPolyline {
-                        // пересчитывается при изменении spikiness (морф окружность→колючка)
+                        // recomputed when spikiness changes (circle→spike morph)
                         path: dot.buildPath()
                     }
                 }

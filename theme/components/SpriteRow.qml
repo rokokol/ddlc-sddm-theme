@@ -1,15 +1,14 @@
 import QtQuick
 
-// Ряд из четырёх девочек над нижними кнопками. Каждая дрейфует строго
-// в своей полосе (полосы не пересекаются и не заходят на зоны углов),
-// поэтому спрайты не выходят за экран и не наезжают ни друг на друга,
-// ни на элементы интерфейса.
+// The row of four characters above the bottom buttons. Each drifts strictly
+// inside its own band — bands never overlap and never reach the corner zones —
+// so no sprite leaves the screen or runs into another one or into the UI
 Item {
     id: row
 
     property int failCount: 0
     readonly property bool justMonika: failCount >= 3
-    // Ширина зон нижних углов (кнопки сессии слева, питания справа)
+    // Width of the bottom corner zones: session buttons left, power right
     property real sideReserve: 240
 
     height: 172
@@ -26,11 +25,11 @@ Item {
 
             calmSource: "../assets/" + modelData + "-sticker-calm.png"
             excitedSource: "../assets/" + modelData + "-sticker-excited.png"
-            // Юри с 1-й неудачи переключается на обрезанные (-cut) спрайты
+            // From the 1st failure Yuri switches to the cut (-cut) sprites
             cutCalmSource: modelData === "yuri" ? "../assets/yuri-sticker-calm-cut.png" : ""
             cutExcitedSource: modelData === "yuri" ? "../assets/yuri-sticker-excited-cut.png" : ""
             cut: modelData === "yuri" && row.failCount >= 1
-            // Юри со 2-й неудачи переключается на искажённые спрайты
+            // From the 2nd failure Yuri switches to the distorted sprites
             distortedCalmSource: modelData === "yuri" ? "../assets/yuri-sticker-distorted-calm.png" : ""
             distortedExcitedSource: modelData === "yuri" ? "../assets/yuri-sticker-distorted-excited.png" : ""
             distorted: modelData === "yuri" && row.failCount >= 2
@@ -40,13 +39,13 @@ Item {
             driftDuration: 4800 + index * 1100
             frozen: row.justMonika
             centerTo: (row.width - width) / 2
-            // Сайори уходит после 1-й неудачи; при пасхалке остаётся одна Моника
+            // Sayori leaves after the 1st failure; the easter egg keeps only Monika
             gone: (modelData === "sayori" && row.failCount >= 1)
                   || (row.justMonika && modelData !== "monika")
         }
     }
 
-    // Иногда случайный персонаж подпрыгивает сам — экран живёт и без мыши
+    // Now and then a random character hops by itself — the screen lives without a mouse
     Timer {
         id: idleHops
 

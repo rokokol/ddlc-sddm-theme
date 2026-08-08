@@ -1,6 +1,7 @@
 [SddmGreeterTheme]
 Name=DDLC
-Description=Тема SDDM в стиле Doki Doki Literature Club
+Description=SDDM theme in the style of Doki Doki Literature Club
+Description[ru]=Тема SDDM в стиле Doki Doki Literature Club
 Type=sddm-theme
 Version=1.0
 MainScript=Main.qml

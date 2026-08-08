@@ -1,19 +1,19 @@
 import QtQuick
 
-// Один персонаж: дрейфует влево-вправо в своей полосе [xMin, xMax],
-// при наведении подпрыгивает и переключается на excited-стикер.
-// В режиме пасхалки (frozen) дрейф останавливается: Моника съезжается
-// в центр, остальные растворяются (gone).
+// A single character: drifts left and right inside its band [xMin, xMax], hops
+// on hover and switches to the excited sticker.
+// In easter-egg mode (frozen) the drift stops: Monika slides to the centre and
+// everyone else fades out (gone)
 Item {
     id: sprite
 
     property url calmSource
     property url excitedSource
-    // Обрезанные (-cut) спрайты — для Юри с 1-й неудачи
+    // Cut (-cut) sprites — Yuri, from the 1st failure
     property url cutCalmSource
     property url cutExcitedSource
     property bool cut: false
-    // Искажённые спрайты (для Юри со 2-й неудачи); если distorted — берутся они
+    // Distorted sprites — Yuri, from the 2nd failure; distorted picks these
     property url distortedCalmSource
     property url distortedExcitedSource
     property bool distorted: false
@@ -28,7 +28,7 @@ Item {
     property bool selfExcited: false
     readonly property bool excitedNow: hoverArea.containsMouse || selfExcited
 
-    // Зеркалим спрайт по направлению движения
+    // Mirror the sprite along the direction of travel
     property real prevX: x
     property bool movingRight: false
     onXChanged: {
@@ -106,7 +106,7 @@ Item {
         mirror: sprite.movingRight
     }
 
-    // Прыжок: вверх резко, вниз с отскоком
+    // Hop: sharp on the way up, bouncy on the way down
     SequentialAnimation {
         id: jump
 
