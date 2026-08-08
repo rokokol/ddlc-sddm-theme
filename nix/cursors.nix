@@ -1,27 +1,18 @@
-# X cursor for the login screen: Sayori's head. The build itself lives in
-# cursors/build-cursors.sh so that the Nix and the plain-install paths stay one implementation
-{
-  stdenvNoCC,
-  lib,
-  xcursorgen,
-  imagemagick,
-}:
+# Sayori's head as an XCursor theme. The theme is committed prebuilt (cursors/theme), so this
+# is a copy — regenerate it from the source frames with cursors/build-cursors.sh
+{ stdenvNoCC, lib }:
 
 stdenvNoCC.mkDerivation {
   pname = "sayori-cursors";
   version = "1.0";
 
-  src = ../cursors;
-
-  nativeBuildInputs = [
-    xcursorgen
-    imagemagick
-  ];
+  src = ../cursors/theme;
 
   installPhase = ''
     runHook preInstall
 
-    bash ./build-cursors.sh $out/share/icons/sayori-cursors
+    mkdir -p $out/share/icons
+    cp -a ./. $out/share/icons/sayori-cursors
 
     runHook postInstall
   '';

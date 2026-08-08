@@ -1,31 +1,31 @@
 #!/usr/bin/env bash
-# Build the Sayori X cursor theme. The plain head is the default cursor, the glitched one
-# is shown over clickable elements — the way the icon changed in the game during glitches.
-# Single implementation for both paths: nix/cursors.nix and install.sh call this script
+# Regenerate cursors/theme/ from the two source frames. Maintainer tool — the built theme is
+# committed, so installing needs neither ImageMagick nor xcursorgen. Rerun this only when
+# assets/sayori-head*.png change
 set -euo pipefail
 
 usage() {
   cat <<EOF
-Usage: build-cursors.sh <icon-theme-dir>
+Usage: build-cursors.sh [output-dir]
 
-Writes an XCursor theme into <icon-theme-dir> (cursors/ plus index.theme), for example
-  build-cursors.sh ~/.local/share/icons/sayori-cursors
+Rebuilds the XCursor theme (cursors/ plus index.theme) in place, or into <output-dir>
 
 Needs: ImageMagick (magick or convert) and xcursorgen
 EOF
 }
 
-[[ $# -eq 1 ]] || {
-  usage >&2
-  exit 2
-}
-[[ $1 == -h || $1 == --help ]] && {
+[[ ${1:-} == -h || ${1:-} == --help ]] && {
   usage
   exit 0
 }
+[[ $# -le 1 ]] || {
+  usage >&2
+  exit 2
+}
 
-src="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)/assets"
-out="$1"
+here="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)"
+src="$here/assets"
+out="${1:-$here/theme}"
 
 # ImageMagick 7 renamed convert to magick; accept either
 if command -v magick >/dev/null; then
@@ -42,6 +42,7 @@ command -v xcursorgen >/dev/null || {
 }
 
 cursors="$out/cursors"
+rm -rf "$cursors"
 mkdir -p "$cursors"
 
 work="$(mktemp -d)"
@@ -54,7 +55,7 @@ build_cursor() {
   local cfg="$work/$name.cfg"
   : >"$cfg"
   for size in 24 32 48 64; do
-    "${im[@]}" "$png" -resize "$size"x"$size" "$work/$name-$size.png"
+    "${im[@]}" "$png" -resize "$size"x"$size" -strip "$work/$name-$size.png"
     echo "$size $((size / 10)) $((size / 10)) $work/$name-$size.png" >>"$cfg"
   done
   xcursorgen "$cfg" "$cursors/$name"
@@ -81,3 +82,5 @@ cat >"$out/index.theme" <<EOF
 Name=sayori-cursors
 Comment=Sayori's head (DDLC) as a cursor for SDDM
 EOF
+
+echo "rebuilt $out"

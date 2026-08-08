@@ -21,6 +21,15 @@ jobs:
             test -e "$theme/$f" || { echo "missing $f"; exit 1; }
           done
           test "$(ls "$theme"/assets/*-sticker-*.png | wc -l)" -eq 12
+      # Cursors ship prebuilt; catch a checkout where they rotted or a symlink lost its target
+      - name: prebuilt cursors are intact
+        run: |
+          icons=$(nix path-info --no-write-lock-file .#sayori-cursors)/share/icons/sayori-cursors
+          test -e "$icons/index.theme"
+          test "$(find "$icons/cursors" -type f | wc -l)" -eq 2
+          find "$icons/cursors" -type l | while read -r l; do
+            test -e "$l" || { echo "dangling: $l"; exit 1; }
+          done
       - run: nix fmt -- --ci
 
   shell:
