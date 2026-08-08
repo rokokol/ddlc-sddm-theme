@@ -1,0 +1,32 @@
+name: build
+
+on:
+  push:
+    branches: [master]
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  nix:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: cachix/install-nix-action@v31
+      - run: nix build --no-write-lock-file .#sddm-ddlc-theme .#sayori-cursors
+      # The theme must stay copy-installable: everything the QML references has to be inside it
+      - name: theme is self-contained
+        run: |
+          theme=$(nix path-info --no-write-lock-file .#sddm-ddlc-theme)/share/sddm/themes/ddlc
+          for f in Main.qml theme.conf metadata.desktop assets/noise.png assets/just-monika-ok.png; do
+            test -e "$theme/$f" || { echo "missing $f"; exit 1; }
+          done
+          test "$(ls "$theme"/assets/*-sticker-*.png | wc -l)" -eq 12
+      - run: nix fmt -- --ci
+
+  shell:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: cachix/install-nix-action@v31
+      - run: nix run nixpkgs#shellcheck -- install.sh cursors/build-cursors.sh
+      - run: nix run nixpkgs#shfmt -- -d -i 2 -ci install.sh cursors/build-cursors.sh
