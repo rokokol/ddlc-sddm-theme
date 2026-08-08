@@ -14,6 +14,7 @@
 ![Nix](https://img.shields.io/badge/Nix-flake-7EBAE4?style=flat&logo=nixos&logoColor=white)
 [![license](https://img.shields.io/badge/code-MIT-3DA639?style=flat)](LICENSE)
 [![assets](https://img.shields.io/badge/assets-Team_Salvato-FF80C0?style=flat)](ASSETS.md)
+[![build](https://github.com/rokokol/ddlc-sddm-theme/actions/workflows/build.yml/badge.svg)](https://github.com/rokokol/ddlc-sddm-theme/actions/workflows/build.yml)
 
 <img src="docs/screenshot-normal.png" alt="экран логина" width="720"/>
 
