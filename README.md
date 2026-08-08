@@ -105,12 +105,12 @@ Everything lives in the `[General]` block of `theme/theme.conf`, read from QML a
 | `bgColor` | `#FFFFFF` | background |
 | `accentPink` / `deepPink` | `#DD77BB` / `#BB5599` | borders and accents |
 | `dotColor` | `#FFDBF0` | the dots |
-| `corruptDot` | `#CC0C29` | the dots in easter-egg mode |
+| `corruptDot` | `#8C1132` | the dots in easter-egg mode |
 | `dotSpacing` / `dotRadius` | `200` / `40` | grid step and dot radius |
 | `scrollDuration` | `14000` | drift period of the background, ms |
 | `panelColor` / `panelBorder` | `#FFFFFF` / `#FFBDE1` | login panel |
 | `okOutline` | `#BB5599` | outline of the OK button |
-| `textDark` / `errorRed` | `#222222` / `#8C1132` | text and errors |
+| `textDark` / `errorRed` | `#222222` / `#CC0C29` | text and errors |
 | `glitchRgbSplit` | `true` | turn off if RGB-split misbehaves on your hardware |
 
 `theme.conf` is **generated**, not written: `nix/theme-conf.nix` takes the colours from [**ddlc-palette**](https://github.com/rokokol/ddlc-palette), which reads them off [ddlc.moe](https://ddlc.moe/) (the dot grid is that site's own 200×200 background tile, down to the radius), and adds the keys the palette has no opinion about. The result is committed, so installing is still a `cp` on a machine without Nix

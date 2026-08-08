@@ -10,10 +10,10 @@ let
     accentPink = "pink";
     deepPink = "plum";
     dotColor = "dot";
-    # Both tones of Sayori's bow: the fill screams, the shade stays readable as text
-    corruptDot = "bow";
+    # Both tones of Sayori's bow: the fill for the error line, the shade for the dots
+    corruptDot = "bowShadow";
     textDark = "ink";
-    errorRed = "bowShadow";
+    errorRed = "bow";
     panelColor = "paper";
     panelBorder = "blush";
     okOutline = "plum";

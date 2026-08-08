@@ -105,12 +105,12 @@ sudo ./install.sh
 | `bgColor` | `#FFFFFF` | цвет фона |
 | `accentPink` / `deepPink` | `#DD77BB` / `#BB5599` | рамки и акценты |
 | `dotColor` | `#FFDBF0` | цвет кружочков |
-| `corruptDot` | `#CC0C29` | цвет кружочков в пасхалке |
+| `corruptDot` | `#8C1132` | цвет кружочков в пасхалке |
 | `dotSpacing` / `dotRadius` | `200` / `40` | шаг решётки и радиус кружка |
 | `scrollDuration` | `14000` | период дрейфа фона, мс |
 | `panelColor` / `panelBorder` | `#FFFFFF` / `#FFBDE1` | панель логина |
 | `okOutline` | `#BB5599` | обводка кнопки OK |
-| `textDark` / `errorRed` | `#222222` / `#8C1132` | текст и ошибки |
+| `textDark` / `errorRed` | `#222222` / `#CC0C29` | текст и ошибки |
 | `glitchRgbSplit` | `true` | выключить, если RGB-split глючит на конкретном железе |
 
 `theme.conf` **генерируется**, а не пишется руками: `nix/theme-conf.nix` берёт цвета из [**ddlc-palette**](https://github.com/rokokol/ddlc-palette), который снимает их с [ddlc.moe](https://ddlc.moe/) (решётка кружков — фоновый тайл 200×200 с самого сайта, вплоть до радиуса), и добавляет ключи, о которых палитре нечего сказать. Результат коммитится, так что установка без Nix — по-прежнему `cp`
