@@ -21,19 +21,23 @@
 
       nixosModules.default = import ./nix/module.nix { inherit self; };
 
-      # A greeter you can run inside your session: sddm-greeter-qt6 --test-mode.
-      # The QML_* / QT_PLUGIN_PATH of the running session would shadow the greeter's own Qt
-      devShells = forAllSystems (pkgs: {
-        default = pkgs.mkShell {
-          packages = [ pkgs.sddm ];
-          shellHook = ''
-            preview() {
-              nix build .#sddm-ddlc-theme --out-link result-theme \
-                && env -u QML2_IMPORT_PATH -u QML_IMPORT_PATH -u QT_PLUGIN_PATH \
-                     sddm-greeter-qt6 --test-mode --theme ./result-theme/share/sddm/themes/ddlc
+      # nix run .#preview — the greeter in a window, without logging out
+      apps = forAllSystems (pkgs: {
+        preview = {
+          type = "app";
+          program = pkgs.lib.getExe (
+            pkgs.writeShellApplication {
+              name = "preview";
+              runtimeInputs = [ pkgs.kdePackages.sddm ];
+              text = ''
+                echo "F8 fakes a wrong password — three presses reach the easter egg"
+                # The session's own QML/plugin paths shadow the greeter's Qt and it fails to start
+                exec env -u QML2_IMPORT_PATH -u QML_IMPORT_PATH -u QT_PLUGIN_PATH \
+                  sddm-greeter-qt6 --test-mode \
+                  --theme ${self.packages.${pkgs.stdenv.hostPlatform.system}.sddm-ddlc-theme}/share/sddm/themes/ddlc
+              '';
             }
-            echo "run 'preview' to open the greeter in a window (F8 fakes a wrong password)"
-          '';
+          );
         };
       });
 
