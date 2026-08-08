@@ -69,7 +69,6 @@
         };
       });
 
-      # theme.conf and the palette repo hold the same hex twice; this is what keeps them equal
       # theme.conf is a generated file that has to stay committed — this is what proves it current
       checks = forAllSystems (pkgs: {
         theme-conf-current = pkgs.runCommand "theme-conf-current" { } ''
