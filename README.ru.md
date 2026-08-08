@@ -2,7 +2,7 @@
 
 # Тема DDLC для SDDM
 
-**Экран логина в стиле Doki Doki Literature Club** ٩(◕‿◕)۶
+**Экран логина в стиле Doki Doki Literature Club** o(^▽^)o
 
 <img src="theme/assets/sayori-sticker-calm.png" alt="Сайори" width="110"/>
 <img src="theme/assets/monika-sticker-calm.png" alt="Моника" width="110"/>
