@@ -10,7 +10,7 @@ The following are derived from or contain official DDLC assets:
 
 | Path | What |
 | --- | --- |
-| `theme/assets/*-sticker-*.png` | character sprites — Sayori, Monika, Natsuki, Yuri, in calm, excited, cut and distorted variants |
+| `theme/assets/*-sticker-*.png` | character sprites — Sayori, Monika, Natsuki, Yuri, in calm, excited, cut and distorted variants. The four calm ones are `sticker_?.png` from [ddlc.moe](https://ddlc.moe/) at native size, padded onto one canvas |
 | `theme/assets/just-monika-ok.png` | the in-game "Just Monika. OK" dialog, used by the easter egg |
 | `cursors/assets/sayori-head.png`, `sayori-head-glitch.png` | two frames cut from DDLC's own sprites, turned into an X cursor by `cursors/build-cursors.sh` |
 

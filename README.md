@@ -102,16 +102,18 @@ Everything lives in the `[General]` block of `theme/theme.conf`, read from QML a
 | --- | --- | --- |
 | `font` | `Doki` | main font family |
 | `iconFont` | `DepartureMono Nerd Font` | glyphs on the power buttons |
-| `bgColor` | `#FFFCFE` | background |
-| `accentPink` / `deepPink` | `#FF80C0` / `#D667A0` | borders and accents |
-| `dotColor` | `#FFDCEE` | the dots |
+| `bgColor` | `#FFFFFF` | background |
+| `accentPink` / `deepPink` | `#DD77BB` / `#BB5599` | borders and accents |
+| `dotColor` | `#FFE5F4` | the dots |
 | `corruptDot` | `#FF1030` | the dots in easter-egg mode |
-| `dotSpacing` / `dotRadius` | `200` / `50` | grid step and dot radius |
+| `dotSpacing` / `dotRadius` | `200` / `40` | grid step and dot radius |
 | `scrollDuration` | `14000` | drift period of the background, ms |
-| `panelColor` / `panelBorder` | `#FFEBF4` / `#FFBDE1` | login panel |
-| `okOutline` | `#BA5297` | outline of the OK button |
-| `textDark` / `errorRed` | `#4A2B3A` / `#D6244A` | text and errors |
+| `panelColor` / `panelBorder` | `#FFFFFF` / `#FFBDE1` | login panel |
+| `okOutline` | `#BB5599` | outline of the OK button |
+| `textDark` / `errorRed` | `#222222` / `#D6244A` | text and errors |
 | `glitchRgbSplit` | `true` | turn off if RGB-split misbehaves on your hardware |
+
+Everything but the two corruption colours is lifted from [ddlc.moe](https://ddlc.moe/) — the dot grid is that site's own 200×200 background tile, down to the radius
 
 On NixOS, set them as options instead of editing the file — the module rebuilds the theme with them merged into `theme.conf`:
 

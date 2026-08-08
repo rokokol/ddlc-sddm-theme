@@ -102,16 +102,18 @@ sudo ./install.sh
 | --- | --- | --- |
 | `font` | `Doki` | основной шрифт |
 | `iconFont` | `DepartureMono Nerd Font` | глифы кнопок питания |
-| `bgColor` | `#FFFCFE` | цвет фона |
-| `accentPink` / `deepPink` | `#FF80C0` / `#D667A0` | рамки и акценты |
-| `dotColor` | `#FFDCEE` | цвет кружочков |
+| `bgColor` | `#FFFFFF` | цвет фона |
+| `accentPink` / `deepPink` | `#DD77BB` / `#BB5599` | рамки и акценты |
+| `dotColor` | `#FFE5F4` | цвет кружочков |
 | `corruptDot` | `#FF1030` | цвет кружочков в пасхалке |
-| `dotSpacing` / `dotRadius` | `200` / `50` | шаг решётки и радиус кружка |
+| `dotSpacing` / `dotRadius` | `200` / `40` | шаг решётки и радиус кружка |
 | `scrollDuration` | `14000` | период дрейфа фона, мс |
-| `panelColor` / `panelBorder` | `#FFEBF4` / `#FFBDE1` | панель логина |
-| `okOutline` | `#BA5297` | обводка кнопки OK |
-| `textDark` / `errorRed` | `#4A2B3A` / `#D6244A` | текст и ошибки |
+| `panelColor` / `panelBorder` | `#FFFFFF` / `#FFBDE1` | панель логина |
+| `okOutline` | `#BB5599` | обводка кнопки OK |
+| `textDark` / `errorRed` | `#222222` / `#D6244A` | текст и ошибки |
 | `glitchRgbSplit` | `true` | выключить, если RGB-split глючит на конкретном железе |
+
+Всё, кроме двух цветов порчи, взято с [ddlc.moe](https://ddlc.moe/) — решётка кружков это фоновый тайл 200×200 с самого сайта, вплоть до радиуса
 
 На NixOS это задаётся опциями, а не правкой файла — модуль пересоберёт тему, подмешав их в `theme.conf`:
 
