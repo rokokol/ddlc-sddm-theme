@@ -33,8 +33,9 @@ let
   own = {
     font = "Doki";
     iconFont = "DepartureMono Nerd Font";
-    # An alpha, which no palette entry carries: the corrupted text is outlined by a shadow
-    corruptOutline = "#40000000";
+    # Outline under the corrupted text. No palette entry carries an alpha, so it is the
+    # palette's black at 25% — and Qt spells that alpha first, as #AARRGGBB
+    corruptOutline = "#40${lib.removePrefix "#" palette.ink}";
     dotSpacing = 200;
     dotRadius = 40;
     scrollDuration = 14000;
