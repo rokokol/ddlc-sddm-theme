@@ -1,9 +1,11 @@
 # theme/theme.conf is generated from here — the colours come from ddlc-palette, the rest is
 # the theme's own. The result is committed so the theme still installs with a plain cp; CI
 # regenerates it and diffs, so the committed copy cannot drift from the palette
-{ lib, palette }:
+{ lib, ddlc }:
 
 let
+  inherit (ddlc) palette;
+
   # theme.conf key -> palette name
   colours = {
     bgColor = "paper";
@@ -33,9 +35,8 @@ let
   own = {
     font = "Doki";
     iconFont = "DepartureMono Nerd Font";
-    # Outline under the corrupted text. No palette entry carries an alpha, so it is the
-    # palette's black at 25% — and Qt spells that alpha first, as #AARRGGBB
-    corruptOutline = "#40${lib.removePrefix "#" palette.ink}";
+    # Outline under the corrupted text: the palette's black at a quarter, in Qt's own spelling
+    corruptOutline = ddlc.argb.ink "0.25";
     dotSpacing = 200;
     dotRadius = 40;
     scrollDuration = 14000;

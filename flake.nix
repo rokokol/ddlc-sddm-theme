@@ -23,7 +23,7 @@
 
       themeConf = import ./nix/theme-conf.nix {
         inherit (nixpkgs) lib;
-        palette = ddlc-palette.lib.palette;
+        ddlc = ddlc-palette.lib;
       };
     in
     {
