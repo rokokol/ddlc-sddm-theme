@@ -11,7 +11,7 @@ Rectangle {
     width: 48
     height: 48
     radius: width / 2
-    color: area.containsMouse ? config.accentPink : "white"
+    color: area.containsMouse ? config.accentPink : config.textLight
     border.color: config.accentPink
     border.width: 2
 
@@ -32,7 +32,7 @@ Rectangle {
         text: btn.glyph
         font.family: config.iconFont
         font.pixelSize: 20
-        color: area.containsMouse ? "white" : config.deepPink
+        color: area.containsMouse ? config.textLight : config.deepPink
     }
 
     MouseArea {

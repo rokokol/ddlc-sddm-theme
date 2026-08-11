@@ -19,9 +19,9 @@ TextField {
     font.family: config.font
     font.pixelSize: 19
     color: config.textDark
-    placeholderTextColor: "#C9A0B4"
+    placeholderTextColor: config.placeholderColor
     selectionColor: config.accentPink
-    selectedTextColor: "white"
+    selectedTextColor: config.textLight
     leftPadding: 18
     rightPadding: 18
     topPadding: 10
@@ -29,7 +29,7 @@ TextField {
 
     background: Rectangle {
         radius: height / 2
-        color: "white"
+        color: config.textLight
         border.color: field.activeFocus ? config.deepPink : config.accentPink
         border.width: 2
     }

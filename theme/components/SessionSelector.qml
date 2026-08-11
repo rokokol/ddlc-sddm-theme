@@ -16,7 +16,7 @@ ComboBox {
 
     background: Rectangle {
         radius: control.height / 2
-        color: "white"
+        color: config.textLight
         border.color: config.accentPink
         border.width: 2
     }
@@ -58,7 +58,7 @@ ComboBox {
 
         background: Rectangle {
             radius: 8
-            color: item.highlighted ? "#FFE3F1" : "transparent"
+            color: item.highlighted ? config.rowHighlight : "transparent"
         }
     }
 
@@ -70,7 +70,7 @@ ComboBox {
 
         background: Rectangle {
             radius: 12
-            color: "white"
+            color: config.textLight
             border.color: config.accentPink
             border.width: 2
         }

@@ -13,16 +13,28 @@ let
     # Both tones of Sayori's bow: the fill for the error line, the shade for the dots
     corruptDot = "bowShadow";
     textDark = "ink";
+    textLight = "paper";
     errorRed = "bow";
     panelColor = "paper";
     panelBorder = "blush";
     okOutline = "plum";
+    placeholderColor = "jacket";
+    rowHighlight = "dot";
+    # RGB-split: the two ends of the palette, warm against cool
+    splitWarm = "bow";
+    splitCool = "sayoriEye";
+    # Scanlines over a glitch — two bright, one dark enough to read as a hole
+    glitchPink = "pink";
+    glitchCyan = "sayoriEye";
+    glitchDark = "yuriShadow";
   };
 
   # Everything the palette has no opinion about
   own = {
     font = "Doki";
     iconFont = "DepartureMono Nerd Font";
+    # An alpha, which no palette entry carries: the corrupted text is outlined by a shadow
+    corruptOutline = "#40000000";
     dotSpacing = 200;
     dotRadius = 40;
     scrollDuration = 14000;
@@ -38,6 +50,7 @@ let
   ]
   ++ lib.mapAttrsToList (k: name: render k palette.${name}) colours
   ++ [
+    (render "corruptOutline" own.corruptOutline)
     (render "dotSpacing" own.dotSpacing)
     (render "dotRadius" own.dotRadius)
     (render "scrollDuration" own.scrollDuration)

@@ -81,7 +81,7 @@ Item {
                     y = Math.random() * overlay.height
                     height = 1 + Math.random() * 5
                     opacity = 0.25 + Math.random() * 0.5
-                    color = Math.random() < 0.5 ? "#FF9AD0" : (Math.random() < 0.5 ? "#66F2F2" : "#333344")
+                    color = Math.random() < 0.5 ? config.glitchPink : (Math.random() < 0.5 ? config.glitchCyan : config.glitchDark)
                     x = -20 + Math.random() * 40
                 }
 
@@ -113,6 +113,6 @@ Item {
         opacity: 0.75
         color: config.deepPink
         style: Text.Outline
-        styleColor: "#40000000"
+        styleColor: config.corruptOutline
     }
 }

@@ -114,7 +114,7 @@ Rectangle {
             width: 44
             height: 44
             radius: width / 2
-            color: layoutArea.containsMouse ? config.accentPink : "white"
+            color: layoutArea.containsMouse ? config.accentPink : config.textLight
             border.color: config.accentPink
             border.width: 2
             Behavior on color {
@@ -127,7 +127,7 @@ Rectangle {
                 anchors.centerIn: parent
                 font.family: config.font
                 font.pixelSize: 14
-                color: layoutArea.containsMouse ? "white" : config.deepPink
+                color: layoutArea.containsMouse ? config.textLight : config.deepPink
                 text: parent.hasLayouts
                       ? keyboard.layouts[keyboard.currentLayout].shortName.toUpperCase()
                       : ""

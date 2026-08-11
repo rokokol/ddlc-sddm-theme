@@ -46,7 +46,7 @@ Item {
         font.pixelSize: 36
         font.bold: true
         font.letterSpacing: 6
-        color: "white"
+        color: config.textLight
     }
 
     MouseArea {

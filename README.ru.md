@@ -110,7 +110,13 @@ sudo ./install.sh
 | `scrollDuration` | `14000` | период дрейфа фона, мс |
 | `panelColor` / `panelBorder` | `#FFFFFF` / `#FFBDE1` | панель логина |
 | `okOutline` | `#BB5599` | обводка кнопки OK |
-| `textDark` / `errorRed` | `#222222` / `#CC0C29` | текст и ошибки |
+| `textDark` / `textLight` | `#222222` / `#FFFFFF` | текст на светлом и на розовом фоне |
+| `errorRed` | `#CC0C29` | строка о неверном пароле |
+| `placeholderColor` | `#B59CA1` | подсказка в пустом поле пароля |
+| `rowHighlight` | `#FFDBF0` | выбранная строка списка сессий |
+| `splitWarm` / `splitCool` | `#CC0C29` / `#72D0FA` | два канала, которые разводит RGB-split |
+| `glitchPink` / `glitchCyan` / `glitchDark` | `#DD77BB` / `#72D0FA` / `#361B39` | полосы поперёк глитча |
+| `corruptOutline` | `#40000000` | тень под искажённым текстом — единственный ключ с альфой |
 | `glitchRgbSplit` | `true` | выключить, если RGB-split глючит на конкретном железе |
 
 `theme.conf` **генерируется**, а не пишется руками: `nix/theme-conf.nix` берёт цвета из [**ddlc-palette**](https://github.com/rokokol/ddlc-palette), который снимает их с [ddlc.moe](https://ddlc.moe/) (решётка кружков — фоновый тайл 200×200 с самого сайта, вплоть до радиуса), и добавляет ключи, о которых палитре нечего сказать. Результат коммитится, так что установка без Nix — по-прежнему `cp`

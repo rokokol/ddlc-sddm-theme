@@ -110,7 +110,13 @@ Everything lives in the `[General]` block of `theme/theme.conf`, read from QML a
 | `scrollDuration` | `14000` | drift period of the background, ms |
 | `panelColor` / `panelBorder` | `#FFFFFF` / `#FFBDE1` | login panel |
 | `okOutline` | `#BB5599` | outline of the OK button |
-| `textDark` / `errorRed` | `#222222` / `#CC0C29` | text and errors |
+| `textDark` / `textLight` | `#222222` / `#FFFFFF` | text on a light and on a pink ground |
+| `errorRed` | `#CC0C29` | the failed-password line |
+| `placeholderColor` | `#B59CA1` | prompt inside the empty password field |
+| `rowHighlight` | `#FFDBF0` | selected row of the session list |
+| `splitWarm` / `splitCool` | `#CC0C29` / `#72D0FA` | the two channels the RGB-split pulls apart |
+| `glitchPink` / `glitchCyan` / `glitchDark` | `#DD77BB` / `#72D0FA` / `#361B39` | scanlines across a glitch |
+| `corruptOutline` | `#40000000` | shadow under the corrupted text — the one key with an alpha |
 | `glitchRgbSplit` | `true` | turn off if RGB-split misbehaves on your hardware |
 
 `theme.conf` is **generated**, not written: `nix/theme-conf.nix` takes the colours from [**ddlc-palette**](https://github.com/rokokol/ddlc-palette), which reads them off [ddlc.moe](https://ddlc.moe/) (the dot grid is that site's own 200×200 background tile, down to the radius), and adds the keys the palette has no opinion about. The result is committed, so installing is still a `cp` on a machine without Nix

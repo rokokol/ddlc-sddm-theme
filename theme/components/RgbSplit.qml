@@ -28,7 +28,7 @@ Item {
         width: split.target ? split.target.width : 0
         height: split.target ? split.target.height : 0
         colorization: 1
-        colorizationColor: "#FF0044"
+        colorizationColor: config.splitWarm
         opacity: 0.35
     }
 
@@ -39,7 +39,7 @@ Item {
         width: split.target ? split.target.width : 0
         height: split.target ? split.target.height : 0
         colorization: 1
-        colorizationColor: "#00E5FF"
+        colorizationColor: config.splitCool
         opacity: 0.35
     }
 }
