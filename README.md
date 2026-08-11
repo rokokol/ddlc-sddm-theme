@@ -30,6 +30,18 @@ Plain QML and INI, no Nix interpolation inside the theme, so it installs on any 
 
 > Unaffiliated with and not endorsed by Team Salvato. The sprites and the cursor are theirs — see [ASSETS.md](ASSETS.md)
 
+## Contents
+
+- [Failures accumulate](#failures-accumulate)
+- [Install](#install)
+  - [NixOS](#nixos)
+  - [Any other distribution](#any-other-distribution)
+- [Fonts](#fonts)
+- [Configuration](#configuration)
+- [Preview without logging out](#preview-without-logging-out)
+- [Layout](#layout)
+- [Credits](#credits)
+
 ## Failures accumulate
 
 Every wrong password runs a glitch of about a second — the panel shakes, RGB-split through `QtQuick.Effects`, random scanlines, flickering corrupted text — and leaves a mark that does not go away
