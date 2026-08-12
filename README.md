@@ -22,8 +22,6 @@
 
 *three wrong passwords in a row — [the full recording](docs/demo.mp4)*
 
-[Русский](README.ru.md)
-
 </div>
 
 Plain QML and INI, no Nix interpolation inside the theme, so it installs on any distribution with an ordinary `cp`. Came over from **my rice, [rokokol/huix](https://github.com/rokokol/huix)**
