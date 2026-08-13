@@ -69,6 +69,11 @@
         };
       });
 
+      # For a consumer who reaches for pkgs rather than this flake's packages directly
+      overlays.default = final: _prev: {
+        inherit (self.packages.${final.stdenv.hostPlatform.system}) sddm-ddlc-theme sayori-cursors;
+      };
+
       checks = forAllSystems (
         pkgs:
         let
