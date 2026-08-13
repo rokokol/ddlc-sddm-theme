@@ -48,7 +48,7 @@ Every wrong password runs a glitch of about a second — the panel shakes, RGB-s
 <img src="docs/screenshot-glitch.png" alt="the wrong-password glitch" width="720"/>
 </div>
 
-| | what changes |
+| failure | what changes |
 | --- | --- |
 | **1st** | film grain appears, Sayori leaves, Yuri cuts, the background darkens a little |
 | **2nd** | the even dot outlines break into ragged spikes, JPEG artefacts kick in, Yuri turns distorted |
