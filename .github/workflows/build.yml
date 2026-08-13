@@ -13,26 +13,16 @@ jobs:
       - uses: actions/checkout@v7
       - uses: cachix/install-nix-action@v31
       - run: nix build --no-write-lock-file .#sddm-ddlc-theme .#sayori-cursors
-      # The theme must stay copy-installable: everything the QML references has to be inside it
-      - name: theme is self-contained
+      # theme-conf-current, theme-is-self-contained, cursors-are-intact, module-wiring, nixos-eval
+      - run: nix flake check --no-write-lock-file
+      # The theme must stay usable without Nix: install.sh copies the tree under a prefix, and
+      # --no-configure keeps it out of /etc, which is the half a runner has no business having
+      - name: install.sh works
         run: |
-          theme=$(nix path-info --no-write-lock-file .#sddm-ddlc-theme)/share/sddm/themes/ddlc
-          for f in Main.qml theme.conf metadata.desktop assets/noise.png assets/just-monika-ok.png; do
-            test -e "$theme/$f" || { echo "missing $f"; exit 1; }
-          done
-          test "$(ls "$theme"/assets/*-sticker-*.png | wc -l)" -eq 12
-      # Cursors ship prebuilt; catch a checkout where they rotted or a symlink lost its target
-      - name: prebuilt cursors are intact
-        run: |
-          icons=$(nix path-info --no-write-lock-file .#sayori-cursors)/share/icons/sayori-cursors
-          test -e "$icons/index.theme"
-          test "$(find "$icons/cursors" -type f | wc -l)" -eq 2
-          find "$icons/cursors" -type l | while read -r l; do
-            test -e "$l" || { echo "dangling: $l"; exit 1; }
-          done
-      # theme.conf is generated and committed; this proves the committed copy is current
-      - name: theme.conf is current
-        run: nix build --no-write-lock-file .#checks.x86_64-linux.theme-conf-current
+          ./install.sh --prefix "$PWD/out" --no-configure
+          test -f out/share/sddm/themes/ddlc/Main.qml
+          test -f out/share/sddm/themes/ddlc/theme.conf
+          test -e out/share/icons/sayori-cursors/index.theme
       - run: nix fmt -- --ci
 
   shell:
