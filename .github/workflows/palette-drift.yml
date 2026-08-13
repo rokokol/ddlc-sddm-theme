@@ -1,0 +1,52 @@
+name: palette-drift
+
+# Re-renders against ddlc-palette's HEAD every week and opens a pull request when a colour has
+# moved upstream. Separate from the main check on purpose: that one renders against the locked
+# palette and would keep passing forever while this theme drifts away from the measured colours
+on:
+  schedule:
+    - cron: "0 7 * * 1"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  palette:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: cachix/install-nix-action@v31
+
+      - name: take the palette's HEAD
+        run: |
+          nix flake update ddlc-palette
+          nix run .#write-theme-conf
+
+      - name: open a pull request if it drifted
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          conf=theme/theme.conf
+          if git diff --quiet -- $conf; then
+            echo "the greeter still matches the palette"
+            exit 0
+          fi
+          git diff --stat -- $conf
+
+          # Which colour moved where, so the notification alone says whether this needs a look
+          summary=$(git diff -U0 -- $conf | grep -E '^[-+][a-zA-Z]+ *=' | head -20)
+          branch=palette/$(date -u +%Y-%m-%d)
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git switch -c "$branch"
+          git commit -qam "$(printf 'the palette moved\n\n%s\n' "$summary")"
+          git push -f origin "$branch"
+          body=$(printf 'ddlc-palette changed and the login screen no longer renders the same.\n\n```diff\n%s\n```\n\nThe lock is bumped in this branch, so merging takes both the new colours and the palette it measured them from.\n' "$summary")
+          if [ "$(gh pr list --head "$branch" --state open --json number --jq length)" = 0 ]; then
+            gh pr create --head "$branch" --title "the palette moved" --body "$body"
+          else
+            gh pr edit "$branch" --body "$body"
+            echo "a pull request for $branch is already open — force-pushed onto it"
+          fi

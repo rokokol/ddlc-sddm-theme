@@ -169,6 +169,8 @@ nix flake check
 
 There is no behaviour suite here — the theme is QML the greeter runs, and nothing short of a greeter can run it. What is checked is everything around it: `theme.conf` is still what the palette renders, the theme directory carries every file the QML names (it has to stay copy-installable), the prebuilt cursors are whole and none of their symlinks dangles, and the NixOS module is evaluated twice — against option stubs, with the theme on and off, and then inside a real nixpkgs module set, because a stub accepts any value while the real one has to turn it into `sddm.conf` and refuses what it cannot write
 
+A weekly workflow re-renders against the palette's HEAD rather than the lock and opens a pull request when they part ways, so a colour cannot move upstream and quietly leave this behind
+
 ## Layout
 
 ```
