@@ -37,8 +37,9 @@ Plain QML and INI, no Nix interpolation inside the theme, so it installs on any 
 - [Fonts](#fonts)
 - [Configuration](#configuration)
 - [Preview without logging out](#preview-without-logging-out)
+- [Tests](#tests)
 - [Layout](#layout)
-- [Credits](#credits)
+- [License](#license)
 
 ## Failures accumulate
 
@@ -160,6 +161,14 @@ Unsetting those three matters: the QML and plugin paths of your running session 
 
 Test-mode has no SDDM daemon, so a real `loginFailed` never arrives — **press F8** to fake a wrong password. Three presses reach the easter egg
 
+## Tests
+
+```sh
+nix flake check
+```
+
+There is no behaviour suite here — the theme is QML the greeter runs, and nothing short of a greeter can run it. What is checked is everything around it: `theme.conf` is still what the palette renders, the theme directory carries every file the QML names (it has to stay copy-installable), the prebuilt cursors are whole and none of their symlinks dangles, and the NixOS module is evaluated twice — against option stubs, with the theme on and off, and then inside a real nixpkgs module set, because a stub accepts any value while the real one has to turn it into `sddm.conf` and refuses what it cannot write
+
 ## Layout
 
 ```
@@ -172,6 +181,6 @@ nix/            theme.nix, cursors.nix, module.nix
 
 QML file names are CamelCase because in QML the file name *is* the type name
 
-## Credits
+## License
 
 Doki Doki Literature Club is by [Team Salvato](https://teamsalvato.com/). This is non-commercial fan content, and the licensing of every bundled image is spelled out in [ASSETS.md](ASSETS.md). The code is MIT
