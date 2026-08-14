@@ -5,12 +5,22 @@ on:
     branches: [master]
   pull_request:
   workflow_dispatch:
+  # Called by update-lock.yml against its temp branch, so the lock bump is checked by this
+  # file rather than by a copy of its commands
+  workflow_call:
+    inputs:
+      ref:
+        type: string
+        required: false
+        default: ""
 
 jobs:
   nix:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v7
+        with:
+          ref: ${{ inputs.ref }}
       - uses: cachix/install-nix-action@v31
       - run: nix build --no-write-lock-file .#sddm-ddlc-theme .#sayori-cursors
       # theme-conf-current, theme-is-self-contained, cursors-are-intact, module-wiring, nixos-eval
@@ -29,6 +39,8 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v7
+        with:
+          ref: ${{ inputs.ref }}
       - uses: cachix/install-nix-action@v31
       - run: nix run nixpkgs#shellcheck -- install.sh cursors/build-cursors.sh
       - run: nix run nixpkgs#shfmt -- -d -i 2 -ci install.sh cursors/build-cursors.sh
