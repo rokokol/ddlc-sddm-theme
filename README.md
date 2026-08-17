@@ -95,7 +95,9 @@ cd ddlc-sddm-theme
 sudo ./install.sh
 ```
 
-With no flags it does everything: copies `theme/` into `/usr/share/sddm/themes/ddlc`, copies the cursors into `/usr/share/icons/sayori-cursors` and writes `/etc/sddm.conf.d/10-ddlc.conf` selecting both. Talk it out of that with `--no-configure` (leave `/etc` alone), `--no-cursors` and `--prefix`
+With no flags it does everything: copies `theme/` into `/usr/share/sddm/themes/ddlc`, copies the cursors into `/usr/share/icons/sayori-cursors` and writes `/etc/sddm.conf.d/10-ddlc.conf` selecting both. Talk it out of that with `--no-configure` (leave `/etc` alone), `--no-cursors`, `--component theme|cursors|all` and `--prefix`
+
+Package recipes can stage both `/usr` and `/etc` without duplicating the layout: `DESTDIR="$pkgdir" PREFIX=/usr ./install.sh`. A split package selects one side with `--component`
 
 Nothing has to be built: the theme and the cursors are committed ready to use, so installing is a copy. ImageMagick and `xcursorgen` are only needed to regenerate the cursors from their source frames through `cursors/build-cursors.sh`
 

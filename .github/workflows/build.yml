@@ -33,6 +33,19 @@ jobs:
           test -f out/share/sddm/themes/ddlc/Main.qml
           test -f out/share/sddm/themes/ddlc/theme.conf
           test -e out/share/icons/sayori-cursors/index.theme
+          PREFIX=/usr ./install.sh --destdir "$PWD/stage-theme" --component theme
+          test -f stage-theme/usr/share/sddm/themes/ddlc/Main.qml
+          test ! -e stage-theme/usr/share/icons/sayori-cursors
+          test -f stage-theme/etc/sddm.conf.d/10-ddlc.conf
+          DESTDIR=$PWD/stage-cursors PREFIX=/usr ./install.sh --component cursors
+          test ! -e stage-cursors/usr/share/sddm/themes/ddlc
+          test -f stage-cursors/usr/share/icons/sayori-cursors/index.theme
+          test ! -e stage-cursors/etc/sddm.conf.d/10-ddlc.conf
+          DESTDIR=$PWD/legacy PREFIX=/usr ./install.sh --no-cursors --no-configure
+          test -f legacy/usr/share/sddm/themes/ddlc/Main.qml
+          test ! -e legacy/usr/share/icons/sayori-cursors
+          test ! -e legacy/etc/sddm.conf.d/10-ddlc.conf
+          ! DESTDIR=$PWD/bad PREFIX=usr ./install.sh >/dev/null 2>&1
       - run: nix fmt -- --ci
 
   shell:

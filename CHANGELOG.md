@@ -4,6 +4,10 @@ Kept in the shape of [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), v
 
 ## [Unreleased]
 
+### Changed
+
+- `install.sh` stages both the prefix and `/etc` under `DESTDIR` and can install only the `theme` or `cursors` component for split packages
+
 ### Documentation
 
 - link the shared `ddlc-palette` from the README badges

@@ -2,8 +2,9 @@
 # Install the DDLC theme on a non-NixOS system. NixOS users take the flake instead — see README
 set -euo pipefail
 
-prefix="/usr"
-with_cursors=1
+prefix="${PREFIX:-/usr}"
+DESTDIR="${DESTDIR:-}"
+COMPONENT="${COMPONENT:-all}"
 configure=1
 
 usage() {
@@ -14,7 +15,9 @@ Installs the theme, builds the cursors and selects both in SDDM. No flags needed
 
 Options:
   --prefix DIR      install prefix (default: $prefix)
-  --no-cursors      skip the Sayori cursor theme
+  --destdir DIR     prepend a staging root (default: ${DESTDIR:-<empty>})
+  --component C     install theme, cursors, or all (default: $COMPONENT)
+  --no-cursors      compatibility shorthand for --component theme
   --no-configure    do not touch /etc/sddm.conf.d, just install the files
   -h, --help        this text
 
@@ -33,8 +36,16 @@ while [[ $# -gt 0 ]]; do
       prefix="${2:?--prefix needs a directory}"
       shift 2
       ;;
+    --destdir)
+      DESTDIR="${2:?--destdir needs a directory}"
+      shift 2
+      ;;
+    --component)
+      COMPONENT="${2:?--component needs a value}"
+      shift 2
+      ;;
     --no-cursors)
-      with_cursors=0
+      COMPONENT=theme
       shift
       ;;
     --no-configure)
@@ -53,41 +64,73 @@ while [[ $# -gt 0 ]]; do
   esac
 done
 
+if [[ -n "$DESTDIR" && "$prefix" != /* ]]; then
+  echo "install.sh: prefix must be absolute when DESTDIR is set: $prefix" >&2
+  exit 2
+fi
+
+case "$COMPONENT" in
+  all)
+    with_theme=1
+    with_cursors=1
+    ;;
+  theme)
+    with_theme=1
+    with_cursors=0
+    ;;
+  cursors)
+    with_theme=0
+    with_cursors=1
+    configure=0
+    ;;
+  *)
+    echo "install.sh: component must be theme, cursors, or all: $COMPONENT" >&2
+    exit 2
+    ;;
+esac
+
 here="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)"
 
 # Check before writing anything, so a broken checkout cannot leave a half-install
-for need in "$here/theme/Main.qml" "$here/theme/theme.conf"; do
-  [[ -e $need ]] || {
-    echo "install.sh: $need is missing — run this from a full checkout" >&2
-    exit 1
-  }
-done
+if ((with_theme)); then
+  for need in "$here/theme/Main.qml" "$here/theme/theme.conf"; do
+    [[ -e $need ]] || {
+      echo "install.sh: $need is missing — run this from a full checkout" >&2
+      exit 1
+    }
+  done
+fi
 if ((with_cursors)) && [[ ! -e $here/cursors/theme/index.theme ]]; then
   echo "install.sh: cursors/theme is missing — rebuild it with cursors/build-cursors.sh," >&2
   echo "or rerun with --no-cursors to install the theme alone" >&2
   exit 1
 fi
 
-command -v sddm >/dev/null || command -v sddm-greeter-qt6 >/dev/null ||
-  echo "install.sh: warning — SDDM not found on PATH, installing anyway" >&2
+if ((with_theme)); then
+  command -v sddm >/dev/null || command -v sddm-greeter-qt6 >/dev/null ||
+    echo "install.sh: warning — SDDM not found on PATH, installing anyway" >&2
+fi
 
-themes="$prefix/share/sddm/themes"
+root="${DESTDIR%/}$prefix"
+themes="$root/share/sddm/themes"
 
 # Writability is decided by the closest ancestor that exists — the rest gets created
-ancestor="$themes"
+ancestor="$root/share"
 while [[ ! -e $ancestor ]]; do ancestor="$(dirname "$ancestor")"; done
 [[ -w $ancestor ]] || {
   echo "install.sh: $ancestor is not writable — rerun with sudo, or pass --prefix ~/.local" >&2
   exit 1
 }
 
-install -d "$themes"
-rm -rf "${themes:?}/ddlc"
-cp -r "$here/theme" "$themes/ddlc"
-echo "installed $themes/ddlc"
+if ((with_theme)); then
+  install -d "$themes"
+  rm -rf "${themes:?}/ddlc"
+  cp -r "$here/theme" "$themes/ddlc"
+  echo "installed $themes/ddlc"
+fi
 
 if ((with_cursors)); then
-  icons="$prefix/share/icons"
+  icons="$root/share/icons"
   install -d "$icons"
   rm -rf "${icons:?}/sayori-cursors"
   cp -a "$here/cursors/theme" "$icons/sayori-cursors"
@@ -96,7 +139,7 @@ fi
 
 if ((configure)); then
   # /usr keeps the theme, /etc keeps the configuration — even under a non-default prefix
-  confd="/etc/sddm.conf.d"
+  confd="${DESTDIR%/}/etc/sddm.conf.d"
   install -d "$confd"
   {
     echo "[Theme]"
