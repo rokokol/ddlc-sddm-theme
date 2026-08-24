@@ -1,11 +1,15 @@
 name: update-lock
 
-# nixpkgs in flake.lock ages on its own and nothing else here moves it: dependabot watches
-# only the uses: pins. This bumps it weekly, runs the very same checks a push runs — build.yml
-# itself, not a copy of its commands — and lands the bump only if they pass
+# flake.lock ages on its own and nothing else here moves it: dependabot watches only the uses:
+# pins. This takes every input's current revision weekly, runs the very same checks a push runs
+# — build.yml itself, not a copy of its commands — and lands the bump only if they pass
+#
+# 06:00 is the second wave of the family cascade: ddlc-palette takes its own nixpkgs at 05:00,
+# this picks the new palette up an hour later, and huix takes every sibling at 07:00 — so a
+# colour that moved upstream is checked against this repo's build before huix sees the revision
 on:
   schedule:
-    - cron: "0 5 * * 1"
+    - cron: "0 6 * * 1"
   workflow_dispatch:
 
 # Two runs would push the same branch from different bases
@@ -31,9 +35,9 @@ jobs:
 
       - id: push
         run: |
-          nix flake update nixpkgs
+          nix flake update
           if git diff --quiet -- flake.lock; then
-            echo "nixpkgs is already current"
+            echo "every input is already current"
             echo "moved=0" >>"$GITHUB_OUTPUT"
             exit 0
           fi
@@ -41,7 +45,7 @@ jobs:
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           branch=flake-lock/$(date -u +%Y-%m-%d)
           git switch -c "$branch"
-          git commit -qam "take nixpkgs' current revision"
+          git commit -qam "take every input's current revision"
           git push -f origin "$branch"
           echo "branch=$branch" >>"$GITHUB_OUTPUT"
           echo "moved=1" >>"$GITHUB_OUTPUT"
