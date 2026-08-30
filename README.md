@@ -27,8 +27,6 @@
 
 Plain QML and INI, no Nix interpolation inside the theme, so it installs on any distribution with an ordinary `cp`. Came over from **my rice, [rokokol/huix](https://github.com/rokokol/huix)**
 
-> Unaffiliated with and not endorsed by Team Salvato. The sprites and the cursor are theirs — see [ASSETS.md](ASSETS.md)
-
 ## Contents
 
 - [Failures accumulate](#failures-accumulate)
