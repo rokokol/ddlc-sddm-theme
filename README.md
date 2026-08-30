@@ -40,7 +40,6 @@ Plain QML and INI, no Nix interpolation inside the theme, so it installs on any 
 - [Preview without logging out](#preview-without-logging-out)
 - [Tests](#tests)
 - [Layout](#layout)
-- [License](#license)
 
 ## Failures accumulate
 
@@ -185,7 +184,3 @@ nix/            theme.nix, cursors.nix, module.nix
 ```
 
 QML file names are CamelCase because in QML the file name *is* the type name
-
-## License
-
-Doki Doki Literature Club is by [Team Salvato](https://teamsalvato.com/). This is non-commercial fan content, and the licensing of every bundled image is spelled out in [ASSETS.md](ASSETS.md). The code is MIT
