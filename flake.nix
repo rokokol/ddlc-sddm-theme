@@ -212,6 +212,17 @@
         }
       );
 
+      # The pinned toolbox for CI: every binary a workflow runs comes from this lock,
+      # never from an unpinned registry lookup — build.yml guards against those
+      devShells = forAllSystems (pkgs: {
+        default = pkgs.mkShell {
+          packages = with pkgs; [
+            shellcheck
+            shfmt
+          ];
+        };
+      });
+
       formatter = forAllSystems (pkgs: pkgs.nixfmt-tree);
     };
 }

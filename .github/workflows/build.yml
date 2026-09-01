@@ -55,5 +55,11 @@ jobs:
         with:
           ref: ${{ inputs.ref }}
       - uses: cachix/install-nix-action@v31
-      - run: nix run nixpkgs#shellcheck -- install.sh cursors/build-cursors.sh
-      - run: nix run nixpkgs#shfmt -- -d -i 2 -ci install.sh cursors/build-cursors.sh
+      - name: CI tools come from the lock, not the registry
+        run: |
+          if grep -rEn 'nix (run|shell) nixpkgs#' .github/workflows; then
+            echo "unpinned registry lookup in a workflow — pin the tool in the flake's dev shell and use nix develop" >&2
+            exit 1
+          fi
+      - run: nix develop --no-write-lock-file -c shellcheck install.sh cursors/build-cursors.sh
+      - run: nix develop --no-write-lock-file -c shfmt -d -i 2 -ci install.sh cursors/build-cursors.sh
