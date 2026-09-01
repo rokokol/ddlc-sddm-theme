@@ -2,7 +2,7 @@
 
 Kept in the shape of [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), versioned by [semver](https://semver.org/spec/v2.0.0.html)
 
-## [Unreleased]
+## [1.1.0] - 2026-09-01
 
 ### Changed
 
