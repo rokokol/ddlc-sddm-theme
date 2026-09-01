@@ -7,6 +7,15 @@ Kept in the shape of [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), v
 ### Changed
 
 - `install.sh` stages both the prefix and `/etc` under `DESTDIR` and can install only the `theme` or `cursors` component for split packages
+- `install.sh` reworked onto the [huix-standard](https://github.com/rokokol/huix-standard) grammar: `-h`/`-v` short flags, canonical `PREFIX` (absolute always), a preflight that installs nothing and prints exact per-distro guidance (SDDM is a session dependency — a warning, not a refusal), and the checkout-completeness and writability checks kept. Components stay additive, each converging its own files on a re-run — dropping `--no-configure` restores the SDDM config, adding it removes one, declaratively
+
+### Added
+
+- `VERSION` at the repo root as the one source of version: both packages read it (they used to say `1.0` while the tag said `v1.0.0` — exactly the drift this ends), `install.sh -v|--version` prints it, CI asserts the changelog heading matches
+- `./install.sh --uninstall` removes an install by its manifest at `share/ddlc-sddm-theme/install-manifest` — `--uninstall --component cursors` takes one component out and keeps the rest, `/etc/sddm.conf.d/10-ddlc.conf` is owned by the theme component and leaves with it; installs made before the manifest existed fall back to the known layout for this one release
+- tab completion for the installer, `source completions/install.sh.{bash,zsh}`, drift-checked against `install.sh` by `tests/check-completions.sh`
+- `tests/installer.sh` — the installer's contract as a fast suite, also run by `nix flake check`; the theme itself keeps having no behaviour suite, `nix run .#preview` is how it gets looked at
+- `tests/distro.sh` — the full preflight→guidance→install→uninstall cycle inside real `debian`, `ubuntu`, `arch` and `fedora` containers with a deliberately Qt-less smoke (files plus the INI shape SDDM parses), and four per-distro CI badges (push, weekly cron, never pull requests)
 
 ### Documentation
 

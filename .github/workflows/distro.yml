@@ -1,0 +1,23 @@
+name: distro
+
+# The reusable half of the distro tests: one distribution per call. The four thin
+# wrappers (distro-debian.yml and friends) exist because a GitHub status badge is
+# per-workflow-file — this is the only way the README gets one badge per distribution
+# without four copies of the job drifting apart
+on:
+  workflow_call:
+    inputs:
+      distro:
+        type: string
+        required: true
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    runs-on: ubuntu-latest # docker is preinstalled on GitHub-hosted runners
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v7
+      - run: tests/distro.sh "${{ inputs.distro }}"

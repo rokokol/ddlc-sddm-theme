@@ -25,6 +25,28 @@
         inherit (nixpkgs) lib;
         ddlc = ddlc-palette.lib;
       };
+
+      # Each piece isolated, so a README edit doesn't rebuild anything
+      installer = builtins.path {
+        name = "install.sh";
+        path = ./install.sh;
+      };
+      versionFile = builtins.path {
+        name = "VERSION";
+        path = ./VERSION;
+      };
+      testsDir = builtins.path {
+        name = "ddlc-sddm-theme-tests";
+        path = ./tests;
+      };
+      completionsDir = builtins.path {
+        name = "ddlc-sddm-theme-completions";
+        path = ./completions;
+      };
+      cursorsBuild = builtins.path {
+        name = "build-cursors.sh";
+        path = ./cursors/build-cursors.sh;
+      };
     in
     {
       packages = forAllSystems (pkgs: rec {
@@ -166,6 +188,61 @@
                 want '.offPackages == []' "a package is installed while disabled"
                 want '.offTheme == ""' "the theme is set while disabled"
                 want '.offSettings == {}' "an SDDM setting survives disabling"
+                touch $out
+              '';
+
+          # The one shell file list lives here and nowhere else: CI's shell job is a
+          # fast named status for this check, not a second copy of the commands
+          scripts-lint =
+            pkgs.runCommand "scripts-lint"
+              {
+                nativeBuildInputs = [
+                  pkgs.shellcheck
+                  pkgs.shfmt
+                  pkgs.zsh
+                ];
+              }
+              ''
+                files="${installer} ${cursorsBuild} ${testsDir}/installer.sh ${testsDir}/distro.sh ${testsDir}/check-completions.sh ${completionsDir}/install.sh.bash"
+                # shellcheck disable=SC2086
+                shellcheck $files
+                # shellcheck disable=SC2086
+                shfmt -d -i 2 -ci $files
+                # zsh is not shellcheck's language; a parse is what can be checked
+                zsh -n ${completionsDir}/install.sh.zsh
+
+                # install.sh and its completions must not drift apart
+                mkdir -p repo/tests
+                cp ${installer} repo/install.sh
+                cp -r ${completionsDir} repo/completions
+                cp ${testsDir}/check-completions.sh repo/tests/
+                bash repo/tests/check-completions.sh
+                touch $out
+              '';
+
+          # The fast installer suite, in the sandbox: the manifest contract, the
+          # per-component sweep, selective uninstall, the declarative --no-configure,
+          # staging, the refusal path. The theme's own behaviour has no suite — it is
+          # QML the greeter runs, and nix run .#preview is how it gets looked at
+          installer-suite =
+            pkgs.runCommand "installer-suite"
+              {
+                # tests/installer.sh builds a deliberately install(1)-less PATH of these
+                nativeBuildInputs = [ pkgs.coreutils ];
+              }
+              ''
+                mkdir -p repo/tests
+                cp ${installer} repo/install.sh
+                cp ${versionFile} repo/VERSION
+                cp -r ${./theme} repo/theme
+                cp -r ${completionsDir} repo/completions
+                cp ${testsDir}/installer.sh ${testsDir}/check-completions.sh repo/tests/
+                mkdir -p repo/cursors
+                cp -r ${./cursors/theme} repo/cursors/theme
+                chmod -R +w repo
+                chmod +x repo/install.sh repo/tests/*.sh
+                patchShebangs repo >/dev/null
+                HOME=$PWD bash repo/tests/installer.sh "$PWD/repo"
                 touch $out
               '';
 

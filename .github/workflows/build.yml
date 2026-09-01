@@ -14,6 +14,9 @@ on:
         required: false
         default: ""
 
+permissions:
+  contents: read
+
 jobs:
   nix:
     runs-on: ubuntu-latest
@@ -22,17 +25,36 @@ jobs:
         with:
           ref: ${{ inputs.ref }}
       - uses: cachix/install-nix-action@v31
+
+      - name: VERSION matches CHANGELOG
+        run: |
+          ver=$(cat VERSION)
+          grep -qF "## [$ver]" CHANGELOG.md || {
+            echo "VERSION says $ver but CHANGELOG.md has no ## [$ver] heading" >&2
+            exit 1
+          }
+
       - run: nix build --no-write-lock-file .#sddm-ddlc-theme .#sayori-cursors
-      # theme-conf-current, theme-is-self-contained, cursors-are-intact, module-wiring, nixos-eval
+      # theme-conf-current, theme-is-self-contained, cursors-are-intact, module-wiring,
+      # nixos-eval, scripts-lint, installer-suite
       - run: nix flake check --no-write-lock-file
-      # The theme must stay usable without Nix: install.sh copies the tree under a prefix, and
-      # --no-configure keeps it out of /etc, which is the half a runner has no business having
+
+      # The full installer contract lives in tests/installer.sh (run by flake check);
+      # this is the smoke that the same script behaves on a real filesystem outside the
+      # sandbox. --no-configure keeps it out of the runner's real /etc
       - name: install.sh works
         run: |
           ./install.sh --prefix "$PWD/out" --no-configure
           test -f out/share/sddm/themes/ddlc/Main.qml
           test -f out/share/sddm/themes/ddlc/theme.conf
           test -e out/share/icons/sayori-cursors/index.theme
+          test -f out/share/ddlc-sddm-theme/install-manifest
+          ./install.sh --prefix "$PWD/out" --uninstall --component cursors
+          test ! -e out/share/icons/sayori-cursors
+          test -f out/share/sddm/themes/ddlc/Main.qml
+          ./install.sh --prefix "$PWD/out" --uninstall
+          test ! -e out/share/ddlc-sddm-theme
+          test ! -e out/share/sddm/themes/ddlc
           PREFIX=/usr ./install.sh --destdir "$PWD/stage-theme" --component theme
           test -f stage-theme/usr/share/sddm/themes/ddlc/Main.qml
           test ! -e stage-theme/usr/share/icons/sayori-cursors
@@ -45,9 +67,17 @@ jobs:
           test -f legacy/usr/share/sddm/themes/ddlc/Main.qml
           test ! -e legacy/usr/share/icons/sayori-cursors
           test ! -e legacy/etc/sddm.conf.d/10-ddlc.conf
-          ! DESTDIR=$PWD/bad PREFIX=usr ./install.sh >/dev/null 2>&1
+          # if-form, not `! cmd`: -e ignores negated pipelines, so a `! cmd` line only
+          # bites while it happens to be the last one — anyone appending disarms it
+          if DESTDIR=$PWD/bad PREFIX=usr ./install.sh >/dev/null 2>&1; then
+            echo "a relative PREFIX was accepted" >&2
+            exit 1
+          fi
+
       - run: nix fmt -- --ci
 
+  # The one file list lives in the flake's scripts-lint check — this job is a fast,
+  # separately-named status for it, not a second copy of the commands
   shell:
     runs-on: ubuntu-latest
     steps:
@@ -55,11 +85,13 @@ jobs:
         with:
           ref: ${{ inputs.ref }}
       - uses: cachix/install-nix-action@v31
+      # nix run/shell nixpkgs#tool is a mirror-fate lookup — whatever nixpkgs the runner
+      # resolves today decides the job. Tools a workflow needs live in the flake's dev
+      # shell, pinned by the lock, reached with nix develop
       - name: CI tools come from the lock, not the registry
         run: |
           if grep -rEn 'nix (run|shell) nixpkgs#' .github/workflows; then
             echo "unpinned registry lookup in a workflow — pin the tool in the flake's dev shell and use nix develop" >&2
             exit 1
           fi
-      - run: nix develop --no-write-lock-file -c shellcheck install.sh cursors/build-cursors.sh
-      - run: nix develop --no-write-lock-file -c shfmt -d -i 2 -ci install.sh cursors/build-cursors.sh
+      - run: nix build --no-write-lock-file .#checks.x86_64-linux.scripts-lint

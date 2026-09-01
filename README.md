@@ -16,6 +16,10 @@
 [![license](https://img.shields.io/badge/code-MIT-3DA639?style=flat)](LICENSE)
 [![assets](https://img.shields.io/badge/assets-Team_Salvato-FF80C0?style=flat)](ASSETS.md)
 [![build](https://github.com/rokokol/ddlc-sddm-theme/actions/workflows/build.yml/badge.svg)](https://github.com/rokokol/ddlc-sddm-theme/actions/workflows/build.yml)
+[![debian](https://github.com/rokokol/ddlc-sddm-theme/actions/workflows/distro-debian.yml/badge.svg)](https://github.com/rokokol/ddlc-sddm-theme/actions/workflows/distro-debian.yml)
+[![ubuntu](https://github.com/rokokol/ddlc-sddm-theme/actions/workflows/distro-ubuntu.yml/badge.svg)](https://github.com/rokokol/ddlc-sddm-theme/actions/workflows/distro-ubuntu.yml)
+[![arch](https://github.com/rokokol/ddlc-sddm-theme/actions/workflows/distro-arch.yml/badge.svg)](https://github.com/rokokol/ddlc-sddm-theme/actions/workflows/distro-arch.yml)
+[![fedora](https://github.com/rokokol/ddlc-sddm-theme/actions/workflows/distro-fedora.yml/badge.svg)](https://github.com/rokokol/ddlc-sddm-theme/actions/workflows/distro-fedora.yml)
 
 <img src="docs/screenshot-normal.png" alt="the login screen" width="720"/>
 
@@ -94,6 +98,22 @@ sudo ./install.sh
 
 With no flags it does everything: copies `theme/` into `/usr/share/sddm/themes/ddlc`, copies the cursors into `/usr/share/icons/sayori-cursors` and writes `/etc/sddm.conf.d/10-ddlc.conf` selecting both. Talk it out of that with `--no-configure` (leave `/etc` alone), `--no-cursors`, `--component theme|cursors|all` and `--prefix`
 
+Nothing is ever installed behind your back: the script needs only coreutils, and if even that is missing it names what and how to get it, exactly, for your distribution — SDDM itself is not a dependency, just a warning when absent. Every path written is recorded in `share/ddlc-sddm-theme/install-manifest`, so the install is reversible, per component or whole:
+
+```sh
+sudo ./install.sh --uninstall --component cursors   # take just the cursors out
+sudo ./install.sh --uninstall                       # take everything out, /etc included
+```
+
+Components are additive — installing one never touches the other — but re-running one converges it: a file a previous install of that component wrote and this run does not is swept away, and running with `--no-configure` removes a previously written SDDM config the same way
+
+Tab completion for the installer's own flags is sourced from the checkout:
+
+```sh
+source completions/install.sh.bash   # bash
+source completions/install.sh.zsh   # zsh
+```
+
 Package recipes can stage both `/usr` and `/etc` without duplicating the layout: `DESTDIR="$pkgdir" PREFIX=/usr ./install.sh`. A split package selects one side with `--component`
 
 Nothing has to be built: the theme and the cursors are committed ready to use, so installing is a copy. ImageMagick and `xcursorgen` are only needed to regenerate the cursors from their source frames through `cursors/build-cursors.sh`
@@ -167,7 +187,9 @@ Test-mode has no SDDM daemon, so a real `loginFailed` never arrives — **press 
 nix flake check
 ```
 
-There is no behaviour suite here — the theme is QML the greeter runs, and nothing short of a greeter can run it. What is checked is everything around it: `theme.conf` is still what the palette renders, the theme directory carries every file the QML names (it has to stay copy-installable), the prebuilt cursors are whole and none of their symlinks dangles, and the NixOS module is evaluated twice — against option stubs, with the theme on and off, and then inside a real nixpkgs module set, because a stub accepts any value while the real one has to turn it into `sddm.conf` and refuses what it cannot write
+There is no behaviour suite here — the theme is QML the greeter runs, and nothing short of a greeter can run it. What is checked is everything around it: `theme.conf` is still what the palette renders, the theme directory carries every file the QML names (it has to stay copy-installable), the prebuilt cursors are whole and none of their symlinks dangles, the NixOS module is evaluated twice — against option stubs, with the theme on and off, and then inside a real nixpkgs module set, because a stub accepts any value while the real one has to turn it into `sddm.conf` and refuses what it cannot write — and `tests/installer.sh` covers the installer's own contract: manifest, per-component sweep, selective uninstall, staging, the refusal path
+
+`tests/distro.sh <distro>` (needs docker or podman) runs the install cycle inside a real `debian`, `ubuntu`, `arch` or `fedora` container: preflight, its printed guidance run verbatim, install, selective uninstall, uninstall. The smoke is deliberately Qt-less — no container runs a greeter — so it asserts the files and the INI shape SDDM parses. In CI that is the four distro badges — on push, weekly against `:latest`, never on pull requests
 
 A weekly workflow re-renders against the palette's HEAD rather than the lock and opens a pull request when they part ways, so a colour cannot move upstream and quietly leave this behind
 
@@ -179,6 +201,10 @@ theme/          Main.qml, theme.conf, metadata.desktop, components/, assets/
 cursors/        the prebuilt XCursor theme, its source frames and the script
                 that regenerates one from the other
 nix/            theme.nix, cursors.nix, module.nix
+install.sh      for systems without Nix; VERSION is the one source of version
+completions/    tab completion for install.sh, sourced from the checkout
+tests/          installer.sh (sandboxed), distro.sh (containers), check-completions.sh
+                — the installer's contract only; the theme itself has no suite
 ```
 
 QML file names are CamelCase because in QML the file name *is* the type name

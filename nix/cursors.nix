@@ -4,7 +4,13 @@
 
 stdenvNoCC.mkDerivation {
   pname = "sayori-cursors";
-  version = "1.0";
+  # The one source of version: VERSION at the repo root, asserted against CHANGELOG by CI
+  version = lib.fileContents (
+    builtins.path {
+      name = "VERSION";
+      path = ../VERSION;
+    }
+  );
 
   src = ../cursors/theme;
 

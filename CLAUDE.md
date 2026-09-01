@@ -12,14 +12,17 @@ The seam in `rokokol/huix` is `nixos/services/desktop/sddm.nix`: it enables `ddl
 
 ```sh
 nix build .#sddm-ddlc-theme .#sayori-cursors
-nix flake check          # theme.conf current, theme self-contained, cursors intact, module wiring, real-nixpkgs eval
+nix flake check          # theme.conf current, theme self-contained, cursors intact, module wiring, real-nixpkgs eval, scripts-lint, installer suite
 nix run .#preview        # the greeter in a window; F8 fakes a wrong password
 nix run .#write-theme-conf
-./install.sh --prefix "$PWD/out" --no-configure
+./tests/installer.sh     # install.sh alone: manifest, sweep, selective uninstall, refusal path
+./tests/distro.sh fedora # the full cycle in a real container (docker/podman; deliberate, images are large)
 nix fmt -- --ci
 ```
 
-There is no behaviour suite: the theme is QML the greeter runs, and nothing short of a greeter runs it. `nix run .#preview` is how it gets looked at
+There is no behaviour suite for the theme itself: it is QML the greeter runs, and nothing short of a greeter runs it — `nix run .#preview` is how it gets looked at. `tests/` holds only the installer's contract (huix-standard infrastructure): the distro smoke is deliberately Qt-less, asserting files and the INI shape SDDM parses
+
+`VERSION` is the one source of version: both packages read it, `install.sh -v` prints it, CI asserts `CHANGELOG.md` has a matching heading. `install.sh` follows the huix-standard component-installer semantics: components are additive, manifest lines carry their owning component (`meta` owns the shared VERSION copy and leaves with the last real component), `--uninstall --component C` removes one selectively, and the per-component sweep is what makes `--no-configure` declarative. New installer flags update both `completions/` files in the same commit, or `check-completions.sh` fails the flake check
 
 ## Layout
 
@@ -27,6 +30,9 @@ There is no behaviour suite: the theme is QML the greeter runs, and nothing shor
 theme/          Main.qml, theme.conf, metadata.desktop, components/, assets/ — copy it anywhere
 cursors/        the prebuilt XCursor theme, its frames and the script that rebuilds one from the other
 nix/            theme.nix, cursors.nix, module.nix, module-test.nix, nixos-eval.nix
+install.sh      for systems without Nix, VERSION its one source of version
+completions/    tab completion for install.sh, drift-checked against it
+tests/          installer.sh, distro.sh, check-completions.sh — installer contract only
 ```
 
 QML file names are CamelCase because in QML the file name *is* the type name — the kebab-case rule stops at that door

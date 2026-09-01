@@ -1,0 +1,21 @@
+name: arch
+
+# Thin wrapper over distro.yml so this distribution gets its own status badge — a badge
+# is per-workflow-file. Runs on push to master, weekly (a fresh runner pulls a fresh
+# :latest, which is the upstream-drift detector), and by hand. Deliberately not on pull
+# requests: a flaky mirror must not redden someone's change
+on:
+  push:
+    branches: [master]
+  schedule:
+    - cron: "0 5 * * 1"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  distro:
+    uses: ./.github/workflows/distro.yml
+    with:
+      distro: arch

@@ -10,7 +10,13 @@
 
 stdenvNoCC.mkDerivation {
   pname = "sddm-ddlc-theme";
-  version = "1.0";
+  # The one source of version: VERSION at the repo root, asserted against CHANGELOG by CI
+  version = lib.fileContents (
+    builtins.path {
+      name = "VERSION";
+      path = ../VERSION;
+    }
+  );
 
   src = ../theme;
 
