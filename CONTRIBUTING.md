@@ -17,7 +17,7 @@ The same is expected of contributions. Name the tool and the model you used, in 
 
 Whoever opens the pull request answers for it. Review what the tool wrote, understand it, and be ready to discuss it without forwarding the questions back to the tool. Undisclosed generated code is the one thing that gets a pull request closed unread
 
-Where the split is genuinely unclear, a bare `Assisted-by:` with no suffix is the right answer — it stays true of anything worth arguing about. The convention and the upstream policies behind it are collected in [rokokol/ai-commit-trailers](https://github.com/rokokol/ai-commit-trailers)
+Where the split is genuinely unclear, a bare `Assisted-by:` with no suffix is the right answer — it stays true of anything worth arguing about. The convention and the upstream policies behind it are collected in [rokokol/ai-commit-trailers-skill](https://github.com/rokokol/ai-commit-trailers-skill)
 
 ## Before a pull request
 
