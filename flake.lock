@@ -7,11 +7,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1788175553,
-        "narHash": "sha256-UVgebuQzuzpKGKKhGIiKIaaxKRp2X7wEHHz0wvg1t+k=",
+        "lastModified": 1788775174,
+        "narHash": "sha256-A6LdLhFwLo+8FJ4+2UWAjc68Li7jNBSZxua+l8CGZi8=",
         "owner": "rokokol",
         "repo": "ddlc-palette",
-        "rev": "c672b49377ea1cb805a1f63315b474f7122b4622",
+        "rev": "fa552bd59f3719e594cbffae88eff499218ff9be",
         "type": "github"
       },
       "original": {
@@ -22,11 +22,11 @@
     },
     "nixpkgs": {
       "locked": {
-        "lastModified": 1788039129,
-        "narHash": "sha256-pa4Q0qErvCvzCaaUph7Sm37RhR4xvPrYI8Lgz6k85+A=",
+        "lastModified": 1788614874,
+        "narHash": "sha256-7QYjT2vHLuX9Z1pdxHXDKCbh1CR3D/2rywB9Tx0MPRg=",
         "owner": "NixOS",
         "repo": "nixpkgs",
-        "rev": "d2f67949798825fe853f7c5d0492b8bf016d3f88",
+        "rev": "c043004d1c6985732bcc1cbc5a9c9aecbbb4e0f0",
         "type": "github"
       },
       "original": {
