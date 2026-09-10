@@ -9,4 +9,4 @@ check-pins.sh rokokol/ci-skill templates/check-pins.sh 42d8ed275977a210e5de961a6
 .github/workflows/distro-ubuntu.yml rokokol/huix-standard-skill templates/github/workflows/distro-ubuntu.yml 7ac14ee112b9cf7e4228fae586d83eb1bb772922 0430bdfd44e4ed9f05739ca31ff6134b91bfe4c1 manual
 .github/workflows/distro-arch.yml rokokol/huix-standard-skill templates/github/workflows/distro-arch.yml 7ac14ee112b9cf7e4228fae586d83eb1bb772922 da56c1614e9959e176f1a573c709059c7628489c manual
 .github/workflows/distro-fedora.yml rokokol/huix-standard-skill templates/github/workflows/distro-fedora.yml 7ac14ee112b9cf7e4228fae586d83eb1bb772922 c8aece5f31635fc95c889addd5a8ceace2eae582 manual
-.github/workflows/vendor-sync.yml rokokol/ci-skill templates/github/workflows/vendor-sync.yml 42d8ed275977a210e5de961a677a476decfaedaa 31f123af249659ef9fec71455c6cd07853403512 manual
+.github/workflows/vendor-sync.yml rokokol/ci-skill templates/github/workflows/vendor-sync.yml 6c486c7c610ee0da0e8a45bedaa2e8c4ba2f288d fff3e79621131df47ef831456e02f79f976dd1fd manual

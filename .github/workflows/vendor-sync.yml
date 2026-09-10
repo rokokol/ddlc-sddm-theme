@@ -1,3 +1,4 @@
+---
 name: vendor-sync
 
 # The files listed in .github/vendor.lock are copies of files other repositories own. This
