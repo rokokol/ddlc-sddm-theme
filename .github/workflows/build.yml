@@ -88,6 +88,10 @@ jobs:
       # nix run/shell nixpkgs#tool is a mirror-fate lookup — whatever nixpkgs the runner
       # resolves today decides the job. Tools a workflow needs live in the flake's dev
       # shell, pinned by the lock, reached with nix develop
+      # Every vendored copy is byte-equal to its source: one edited here instead of at the
+      # source fails by name — see .github/vendor.lock
+      - name: vendored copies are byte-equal to their source
+        run: ./vendor-sync.sh check
       - name: CI tools come from the lock, not the registry
         run: ./check-pins.sh
       - run: nix build --no-write-lock-file .#checks.x86_64-linux.scripts-lint
