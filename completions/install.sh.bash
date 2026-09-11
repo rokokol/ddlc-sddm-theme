@@ -2,8 +2,7 @@
 # Bash completion for ./install.sh of ddlc-sddm-theme. Sourced from the checkout, not
 # installed:
 #   source completions/install.sh.bash
-# No dependency on the bash-completion package — everything used here is bash builtin,
-# and nothing newer than the bash 3.2 a stock macOS sources it with.
+# No dependency on the bash-completion package — everything used here is bash builtin.
 #
 # The flag list is written by hand on purpose and checked against install.sh by
 # check-sh.sh -c in scripts-lint: a flag added to the installer fails the gate until it
