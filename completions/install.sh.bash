@@ -4,7 +4,7 @@
 # No dependency on the bash-completion package — everything used here is bash builtin.
 #
 # The flag list is written by hand on purpose and checked against install.sh by
-# tests/check-completions.sh: a flag added to the installer fails the suite until it
+# check-sh.sh -c in scripts-lint: a flag added to the installer fails the gate until it
 # lands here and in the zsh file too
 _install_sh_completion() {
   local cur prev

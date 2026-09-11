@@ -203,7 +203,9 @@ cursors/        the prebuilt XCursor theme, its source frames and the script
 nix/            theme.nix, cursors.nix, module.nix
 install.sh      for systems without Nix; VERSION is the one source of version
 completions/    tab completion for install.sh, sourced from the checkout
-tests/          installer.sh (sandboxed), distro.sh (containers), check-completions.sh
+check-sh.sh     vendored from bash-best-practices, holds install.sh's help
+                and completions to its parser
+tests/          installer.sh (sandboxed), distro.sh (containers)
                 — the installer's contract only; the theme itself has no suite
 ```
 

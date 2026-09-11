@@ -22,7 +22,7 @@ nix fmt -- --ci
 
 There is no behaviour suite for the theme itself: it is QML the greeter runs, and nothing short of a greeter runs it — `nix run .#preview` is how it gets looked at. `tests/` holds only the installer's contract (huix-standard infrastructure): the distro smoke is deliberately Qt-less, asserting files and the INI shape SDDM parses
 
-`VERSION` is the one source of version: both packages read it, `install.sh -v` prints it, CI asserts `CHANGELOG.md` has a matching heading. `install.sh` follows the huix-standard component-installer semantics: components are additive, manifest lines carry their owning component (`meta` owns the shared VERSION copy and leaves with the last real component), `--uninstall --component C` removes one selectively, and the per-component sweep is what makes `--no-configure` declarative. New installer flags update both `completions/` files in the same commit, or `check-completions.sh` fails the flake check
+`VERSION` is the one source of version: both packages read it, `install.sh -v` prints it, CI asserts `CHANGELOG.md` has a matching heading. `install.sh` follows the huix-standard component-installer semantics: components are additive, manifest lines carry their owning component (`meta` owns the shared VERSION copy and leaves with the last real component), `--uninstall --component C` removes one selectively, and the per-component sweep is what makes `--no-configure` declarative. New installer flags update both `completions/` files in the same commit, or `check-sh.sh -c` fails the flake check
 
 ## Layout
 
@@ -32,7 +32,9 @@ cursors/        the prebuilt XCursor theme, its frames and the script that rebui
 nix/            theme.nix, cursors.nix, module.nix, module-test.nix, nixos-eval.nix
 install.sh      for systems without Nix, VERSION its one source of version
 completions/    tab completion for install.sh, drift-checked against it
-tests/          installer.sh, distro.sh, check-completions.sh — installer contract only
+check-sh.sh     vendored from bash-best-practices, holds install.sh's help
+                and completions to its parser
+tests/          installer.sh, distro.sh — installer contract only
 ```
 
 QML file names are CamelCase because in QML the file name *is* the type name — the kebab-case rule stops at that door

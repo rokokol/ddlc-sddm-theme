@@ -10,3 +10,4 @@ check-pins.sh rokokol/ci-skill templates/check-pins.sh 42d8ed275977a210e5de961a6
 .github/workflows/distro-arch.yml rokokol/huix-standard-skill templates/github/workflows/distro-arch.yml 7ac14ee112b9cf7e4228fae586d83eb1bb772922 da56c1614e9959e176f1a573c709059c7628489c manual
 .github/workflows/distro-fedora.yml rokokol/huix-standard-skill templates/github/workflows/distro-fedora.yml 7ac14ee112b9cf7e4228fae586d83eb1bb772922 c8aece5f31635fc95c889addd5a8ceace2eae582 manual
 .github/workflows/vendor-sync.yml rokokol/ci-skill templates/github/workflows/vendor-sync.yml d55020ab3ca780ea6299336d923b8a3fcb8f491d a5bde77f98d55a43b2c993f4c96a952e0b68010d manual
+check-sh.sh rokokol/bash-best-practices-skill check-sh.sh e3211f2cf47a36ed3b6d9a044954ecb101f2542a 550127ffa6570eb702d86be372bd7666aa183605

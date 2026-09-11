@@ -5,7 +5,7 @@
 # to have run, which every interactive zsh with completion already has.
 #
 # The flag list is written by hand on purpose and checked against install.sh by
-# tests/check-completions.sh — same discipline as the bash file
+# check-sh.sh -c in scripts-lint — same discipline as the bash file
 _install_sh_completion() {
   _arguments \
     '(-h --help)'{-h,--help}'[show help and exit]' \
