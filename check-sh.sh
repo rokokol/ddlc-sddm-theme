@@ -321,8 +321,12 @@ has_token() { # has_token TOKEN <<<TEXT -> 0 when TEXT holds TOKEN as a whole to
 # What a completion file offers, without the prose around it. A word in a comment is not
 # offered, and neither is one in a zsh description: the text in `[...]` after an option,
 # the part after the colon of a `'sub:description'` entry, the message between the first
-# colons of an `'N:message:action'` spec — whose action, `(run stop)`, is kept. Quotes are
-# walked a line at a time, so a `#` inside them is not a comment.
+# colons of an `'N:message:action'` spec — whose action, `(run stop)`, is kept. Nor is a
+# case pattern opening a line inside `case … in … esac`, `-l)` or `--prefix | --destdir)`:
+# that arm handles a flag's value and offers nothing, and a flag dropped from the list
+# survived there. Only single words joined by `|` count as a pattern, so the last line of
+# an array wrapped onto two, `    --no-configure --uninstall)`, is still read as offered.
+# Quotes are walked a line at a time, so a `#` inside them is not a comment.
 offered_words() { # offered_words FILE 0|1 -> FILE with comments dropped, and zsh prose when 1
   awk -v zsh="$2" '
     function prose(s, n, f, i, out) {
@@ -339,6 +343,9 @@ offered_words() { # offered_words FILE 0|1 -> FILE with comments dropped, and zs
     }
     {
       line = $0; out = ""; q = ""; body = ""
+      if ($0 ~ /^[ \t]*case .* in[ \t]*$/) incase++
+      else if (incase && $0 ~ /^[ \t]*esac([ \t;]|$)/) incase--
+      else if (incase) sub(/^[ \t]*[^ \t|()]+([ \t]*[|][ \t]*[^ \t|()]+)*\)/, "", line)
       while (line != "") {
         c = substr(line, 1, 1)
         if (q == "") {
@@ -465,14 +472,31 @@ known_flag() { # known_flag FLAG [SUB] -> 0 when SUB (or any parser) accepts it,
 if ((claims_32)); then
   bash4='\[\[[^]]*[-]v [A-Za-z_]|mapfil[e] |readarra[y] |declar[e] -A|loca[l] -A|declar[e] -n|loca[l] -n'
   bash4="$bash4"'|\$\{[A-Za-z_]+,[,]\}|\$\{[A-Za-z_]+\^[\^]\}|\$\{[A-Za-z_]+@[QEPAaKk]\}|;;[&]|[^|]\|[&][^&]|wai[t] -n'
+  # A negative length, a descriptor named by a variable, a fractional read timeout, globstar
+  bash4="$bash4"'|\$\{[A-Za-z_][A-Za-z0-9_]*:[^}:]*:[-][0-9]|(^|[^$])[{][A-Za-z_][A-Za-z0-9_]*[}][<>]|rea[d] [^;|&]*-t ?[0-9]*[.][0-9]|globsta[r]'
+  # Parsed by both, read two ways: 3.2 keeps a quoted replacement's quotes, 5.2 reads & as
+  # the match
+  bash4="$bash4"'|\$\{[A-Za-z_][A-Za-z0-9_]*//?[^/}]*/["]|\$\{[A-Za-z_][A-Za-z0-9_]*//?[^/}]*/[^}]*[&]'
   # A bare `mktemp -d` is fine on macOS, whose page says it "behaves as if -t tmp was
   # supplied"; the GNU flags are not, and -t means a prefix there and a template here
   bsd='sor[t] -[A-Za-z]*V|gre[p] -[A-Za-z]*P|readlin[k] -f|dat[e] -d|mktem[p] (-[dqu]+ )*(-[pt]|--tmpdir|--suffix)'
+  # sed -i takes a suffix on BSD and none on GNU, so neither spelling runs on both
+  bsd="$bsd"'|se[d] (-[A-Za-z]+ )*-[A-Za-z]*i|se[d] [^|;]*--in-plac[e]|gre[p] [^|;]*--exclude-di[r]'
+  bsd="$bsd"'|(^|[^-A-Za-z0-9_{$])timeou[t] [0-9]|ta[r] [^|;]*--(wildcard[s]|nul[l])'
   while IFS= read -r hit; do
     [[ -n "$hit" ]] || continue
     finding "$name claims bash 3.2 but $script:$hit — a proxy grep; the proof is a run under 3.2"
   done < <(grep -nE "$bash4|$bsd" "$code" | grep -vE '^[0-9]+:[[:space:]]*#' | sed 's/^\([0-9]*\):[[:space:]]*/\1 has: /' || :)
 fi
+
+# ---- a positional parameter guarded by ${N:?} ------------------------------------
+# It reads like an argument check and exits 1 with bash's own text, where a missing
+# argument is a usage error: t.sh answered 23 of them with the code a failing command
+# exits, and no literal `exit` betrayed it
+while IFS= read -r hit; do
+  [[ -n "$hit" ]] || continue
+  finding "$script:$hit — \${N:?} exits 1 with bash's message, where a missing argument is a usage error; guard it with ((\$# >= N)) || die"
+done < <(grep -nE '\$\{[0-9]+:[?]' "$code" | grep -vE '^[0-9]+:[[:space:]]*#' | sed 's/^\([0-9]*\):[[:space:]]*/\1 has: /' || :)
 
 # ---- the help ---------------------------------------------------------------------
 if ((! proxy_only)); then
@@ -606,6 +630,9 @@ done
 
 # ---- the completions --------------------------------------------------------------
 if [[ -n "$comp_bash" ]]; then
+  # A file that is only ever sourced has no shebang, so its first line names the dialect
+  [[ "$(head -n 1 "$comp_bash")" == "# shellcheck shell=bash" ]] ||
+    finding "$comp_bash does not open with \`# shellcheck shell=bash\`, the dialect line a sourced file needs"
   offered_words "$comp_bash" 0 >"$work/offered.bash"
   offered_words "$comp_zsh" 1 >"$work/offered.zsh"
   for f in "$comp_bash" "$comp_zsh"; do
@@ -855,6 +882,28 @@ c=$(copy comp-bracket)
 # A flag that survives only in the [...] text of another option is not offered
 sed "s/'(-n --dry-run)'{-n,--dry-run}'\[say what would be done\]'/'-n[say what would be done, as --dry-run does]'/" "$canon/_script.sh" >"$c/_script.sh"
 expect_red "$c" "--dry-run is parsed by script.sh but absent from $c/_script.sh" "a flag named only in a zsh option description" -n script.sh -c "$c/script.sh.bash" "$c/_script.sh" "$c/script.sh"
+
+c=$(copy comp-case-arm)
+# A flag dropped from the offered list survives in the case arm that handles its value
+sed 's/words="-n --dry-run -l"/words="-n --dry-run"/' "$canon/script.sh.bash" >"$c/script.sh.bash"
+expect_red "$c" "-l is parsed by script.sh but absent from $c/script.sh.bash" "a flag left only as a case pattern of the bash completion" -n script.sh -c "$c/script.sh.bash" "$c/_script.sh" "$c/script.sh"
+
+c=$(copy comp-wrapped-list)
+# The last line of an offered list wrapped onto two ends in `)` inside a case arm, and is
+# still an offer rather than a pattern: two consumers wrap their flag arrays this way
+awk '/words="-n --dry-run -l"/ { sub(/words="-n --dry-run -l"/, "local -a w=(-n"); print; print "          --dry-run -l)"; next } { print }' "$canon/script.sh.bash" >"$c/script.sh.bash"
+nested "$c" -n script.sh -c "$c/script.sh.bash" "$c/_script.sh" "$c/script.sh" >/dev/null 2>&1 ||
+  die "self-test: a flag list wrapped onto a second line ending in ) was read as a case pattern:"$'\n'"$(nested "$c" -n script.sh -c "$c/script.sh.bash" "$c/_script.sh" "$c/script.sh" 2>&1 || :)"
+
+c=$(copy comp-dialect)
+tail -n +2 "$canon/script.sh.bash" >"$c/script.sh.bash"
+expect_red "$c" "does not open with" "a bash completion without its dialect line" -n script.sh -c "$c/script.sh.bash" "$c/_script.sh" "$c/script.sh"
+
+c=$(copy param-guard)
+# Spelled in two halves, so this file's own source holds no such guard
+# shellcheck disable=SC2016 # the expansion belongs to the script being written out
+plant "$c" 'HERE=' 'x="${1'':?a value}"'
+expect_red "$c" "exits 1 with bash's message" "a positional parameter guarded by \${N:?}" -n script.sh "$c/script.sh"
 
 c=$(copy comp-action)
 # The action of an `N:message:action` spec is what zsh offers, and it counts

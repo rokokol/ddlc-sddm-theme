@@ -2,7 +2,7 @@
 # vendor-sync.sh, one per line: LOCAL OWNER/REPO PATH COMMIT BLOB [manual]. Never edit a
 # copy in place: change it at its source and let the weekly cascade bring it back. How it
 # works: references/bump-cascade.md in https://github.com/rokokol/ci-skill
-vendor-sync.sh rokokol/ci-skill templates/vendor-sync.sh d55020ab3ca780ea6299336d923b8a3fcb8f491d 23aa4cea36dc2af601b24df8374590b25e7e9e09
+vendor-sync.sh rokokol/ci-skill templates/vendor-sync.sh 0243fddcce0796c395483b4640d76d564c998f27 8a72988e016b172f18d0bbe4c34d75ba427ab360
 check-pins.sh rokokol/ci-skill templates/check-pins.sh 42d8ed275977a210e5de961a677a476decfaedaa e259b35eb552b43fe92582c708f4d870e5f012d6
 .github/workflows/distro.yml rokokol/huix-standard-skill templates/github/workflows/distro.yml 7ac14ee112b9cf7e4228fae586d83eb1bb772922 6dc3caf8cff783f2b07ceb523cc24897f1310df3 manual
 .github/workflows/distro-debian.yml rokokol/huix-standard-skill templates/github/workflows/distro-debian.yml 7ac14ee112b9cf7e4228fae586d83eb1bb772922 13278f25b96a3071ddc2ae2e01151b5e8d8aedc7 manual
@@ -10,4 +10,4 @@ check-pins.sh rokokol/ci-skill templates/check-pins.sh 42d8ed275977a210e5de961a6
 .github/workflows/distro-arch.yml rokokol/huix-standard-skill templates/github/workflows/distro-arch.yml 7ac14ee112b9cf7e4228fae586d83eb1bb772922 da56c1614e9959e176f1a573c709059c7628489c manual
 .github/workflows/distro-fedora.yml rokokol/huix-standard-skill templates/github/workflows/distro-fedora.yml 7ac14ee112b9cf7e4228fae586d83eb1bb772922 c8aece5f31635fc95c889addd5a8ceace2eae582 manual
 .github/workflows/vendor-sync.yml rokokol/ci-skill templates/github/workflows/vendor-sync.yml d55020ab3ca780ea6299336d923b8a3fcb8f491d a5bde77f98d55a43b2c993f4c96a952e0b68010d manual
-check-sh.sh rokokol/bash-best-practices-skill check-sh.sh e3211f2cf47a36ed3b6d9a044954ecb101f2542a 550127ffa6570eb702d86be372bd7666aa183605
+check-sh.sh rokokol/bash-best-practices-skill check-sh.sh 58213f1771505d949fe4e221fac1d05a3ba4ff4e 16f12c9e8fd7434eba67a7706a63b690e5942ac3
