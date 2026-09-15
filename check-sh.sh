@@ -1,22 +1,21 @@
 #!/usr/bin/env bash
-# The gate a shell utility needs, in one file that travels. The help is the single source
-# of truth for what a script accepts, so every subcommand its dispatcher has, every flag
-# its parsers take, every variable it reads and every code it exits with must be in the
-# help — and every document and completion that restates a list is held to the same code,
-# in both directions. Each check is proven able to fail on every run, on a canonical
-# script with one defect planted, so a copy of this file falsifies itself wherever it runs
-#
-# It has no repo-specific part: another repository takes it through the vendoring cascade
-# (references/bump-cascade.md in https://github.com/rokokol/ci-skill), never edits its copy
-# in place, and calls it from its own gate. What it accepts is usage() below, and nowhere
-# else
-# Nothing here reaches the network. Needs bash 3.2 and POSIX tools only, so it runs on a
-# macOS runner unchanged
+# Other repositories take this file through the vendoring cascade (references/bump-cascade.md
+# in https://github.com/rokokol/ci-skill): a copy is never edited in place, a change is made
+# here and reaches them from here
+# Needs bash 3.2 and POSIX tools only, so it runs on a macOS runner unchanged
 set -euo pipefail
 
 usage() {
   cat <<'EOF'
 check-sh.sh — holds a shell script's help, documents and completions to its code
+
+The help is the single source of truth for what a script accepts, so every subcommand its
+dispatcher has, every flag its parsers take, every variable it reads and every code it
+exits with must be in the help — and every document and completion that restates a list
+is held to the same code, in both directions. Each check is proven able to fail on every
+run, on a canonical script with one defect planted, so a copy falsifies itself wherever
+it runs. It has no repo-specific part: a repository takes it through the vendoring
+cascade and calls it from its own gate
 
   check-sh.sh [-n NAME] [-e PREFIX] [-d DOC]... [-m DOC]... [-c BASH ZSH] SCRIPT
   check-sh.sh --template [script|bash|zsh]
@@ -36,11 +35,12 @@ The shapes it reads are the standard's own: a `case "$cmd"` dispatcher at the to
 with `-h | --help | help)` and a `*)` arm that sends usage to stderr, flag arms such as
 `-n | --dry-run)` inside cmd_<sub>() functions or at the top level, literal `exit N`, a
 help printed from a heredoc or by a `help [SUB]` subcommand, and a header comment that
-makes claims and lists nothing. They are spelled out in references/shape.md and help.md
-of https://github.com/rokokol/bash-best-practices-skill. A header line claiming "Needs
-bash 3.2" turns on a grep for constructs newer than 3.2 or absent from a BSD userland; a
-grep is a proxy, and the proof is a run under the real 3.2
+lists nothing. They are spelled out in references/shape.md and help.md of
+https://github.com/rokokol/bash-best-practices-skill. A header line claiming "Needs bash
+3.2" turns on a grep for constructs newer than 3.2 or absent from a BSD userland; a grep
+is a proxy, and the proof is a run under the real 3.2
 
+Nothing here reaches the network
 Exit 0 when everything agrees, 1 with one `check-sh: <what>` line per finding, 2 on a
 usage error, an unreadable file, a --help that fails, or a script with nothing to check
 EOF
@@ -60,14 +60,12 @@ die() { # a usage error, never a finding
 template_script() {
   cat <<'TEMPLATE'
 #!/usr/bin/env bash
-# What a maintainer needs and a caller does not: why the script exists, where it comes
-# from, what it must never do. What it accepts is usage() below, and nowhere else
-# Nothing here reaches the network. Needs bash 3.2 and POSIX tools only.
+# Needs bash 3.2 and POSIX tools only
 set -euo pipefail
 
 usage() {
   cat <<'EOF'
-script.sh — one line saying what it is, in the shape every script of the family has
+script.sh — one line saying what it is and what it is for
 
   script.sh run [-n|--dry-run] [-l DIR]    do the thing, in DIR
   script.sh stop                           stop doing it
@@ -76,6 +74,7 @@ script.sh — one line saying what it is, in the shape every script of the famil
   -l DIR          the log directory (default: $SCRIPT_LOGDIR, else the current one)
 
 Environment: SCRIPT_LOGDIR is the log directory when -l is not given
+Nothing here reaches the network
 Exit 0 done, 1 when the thing asked about is wrong, 2 on a usage error
 EOF
 }
@@ -293,11 +292,16 @@ finding() {
 work=$(mktemp -d "${TMPDIR:-/tmp}/check-sh.XXXXXX")
 trap 'rm -rf "$work"' EXIT
 
-# The code, with every heredoc body blanked and its line numbers kept: a help text or a
-# template inside a heredoc carries dispatchers, flag rows and exit lines of its own,
-# which are not this script's. The opening line stays, since it can carry code
-strip_heredocs() { # strip_heredocs FILE -> the file with heredoc bodies as empty lines
-  awk '
+# The code as the checker reads it, line numbers kept. Every heredoc body is blanked: a
+# help text or a template inside one carries dispatchers, flag rows and exit lines of its
+# own, which are not this script's. The opening line stays, since it can carry code. A
+# `<<WORD` opens a heredoc only outside quotes and comments: read inside a string as an
+# opener, it blanked the rest of the file. With 1 as the second argument the inside of
+# every single-quoted string is blanked too, for the proxy grep: such a string runs
+# nothing, so a construct it names is none of the script's. Quotes are tracked across
+# lines, since an awk or sed program spans several
+mask_code() { # mask_code FILE 0|1 -> FILE with heredoc bodies, and single-quoted text when 1, blanked
+  awk -v sq="$2" '
     inhd {
       line = $0
       if (dash) sub(/^\t+/, "", line)
@@ -305,14 +309,38 @@ strip_heredocs() { # strip_heredocs FILE -> the file with heredoc bodies as empt
       print ""
       next
     }
-    match($0, /<<-?['"'"'"]?[A-Za-z_][A-Za-z0-9_]*/) {
-      w = substr($0, RSTART, RLENGTH)
-      dash = (substr(w, 3, 1) == "-")
-      sub(/^<<-?['"'"'"]?/, "", w)
-      term = w
-      inhd = 1
+    {
+      out = ""
+      opener = ""
+      n = length($0)
+      for (i = 1; i <= n; i++) {
+        c = substr($0, i, 1)
+        if (q == "\047") {
+          if (c == "\047") { q = ""; out = out c } else out = out (sq ? " " : c)
+          continue
+        }
+        if (q == "\"") {
+          if (c == "\\") { out = out substr($0, i, 2); i++; continue }
+          if (c == "\"") q = ""
+          out = out c
+          continue
+        }
+        if (c == "\\") { out = out substr($0, i, 2); i++; continue }
+        if (c == "#" && (i == 1 || substr($0, i - 1, 1) ~ /[ \t;&|()]/)) { out = out substr($0, i); break }
+        if (c == "\047" || c == "\"") { q = c; out = out c; continue }
+        if (opener == "" && substr($0, i, 2) == "<<" && substr($0, i, 3) != "<<<" && (i == 1 || substr($0, i - 1, 1) != "<") &&
+          match(substr($0, i), /^<<-?[\047"]?[A-Za-z_][A-Za-z0-9_]*/))
+          opener = substr($0, i, RLENGTH)
+        out = out c
+      }
+      print out
+      if (opener != "") {
+        dash = (substr(opener, 3, 1) == "-")
+        sub(/^<<-?[\047"]?/, "", opener)
+        term = opener
+        inhd = 1
+      }
     }
-    { print }
   ' "$1"
 }
 
@@ -389,7 +417,9 @@ proxy_only=0
   claims_32=0
   ! printf '%s\n' "$header" | grep -q 'Needs bash 3\.2' || claims_32=1
   code="$work/code"
-  strip_heredocs "$script" >"$code"
+  mask_code "$script" 0 >"$code"
+  code_sq="$work/code_sq"
+  mask_code "$script" 1 >"$code_sq"
 
   # The dispatcher: the top-level `case "$cmd" in` … `esac`, one arm per subcommand,
   # `a | b)` split into two. The help arm and the refusal arms are not subcommands.
@@ -492,10 +522,12 @@ if ((claims_32)); then
   # sed -i takes a suffix on BSD and none on GNU, so neither spelling runs on both
   bsd="$bsd"'|se[d] (-[A-Za-z]+ )*-[A-Za-z]*i|se[d] [^|;]*--in-plac[e]|gre[p] [^|;]*--exclude-di[r]'
   bsd="$bsd"'|(^|[^-A-Za-z0-9_{$])timeou[t] [0-9]|ta[r] [^|;]*--(wildcard[s]|nul[l])'
+  # Matched in the masked text, shown as the script has it: the line numbers are the same
   while IFS= read -r hit; do
     [[ -n "$hit" ]] || continue
     finding "$name claims bash 3.2 but $script:$hit — a proxy grep; the proof is a run under 3.2"
-  done < <(grep -nE "$bash4|$bsd" "$code" | grep -vE '^[0-9]+:[[:space:]]*#' | sed 's/^\([0-9]*\):[[:space:]]*/\1 has: /' || :)
+  done < <(grep -nE "$bash4|$bsd" "$code_sq" | grep -vE '^[0-9]+:[[:space:]]*#' | cut -d: -f1 |
+    awk 'NR == FNR { want[$1]; next } FNR in want { sub(/^[[:space:]]*/, ""); print FNR " has: " $0 }' - "$code" || :)
 fi
 
 # ---- a positional parameter guarded by ${N:?} ------------------------------------
@@ -811,7 +843,8 @@ nested "$c" $(full "$c") >/dev/null 2>&1 || die "self-test: a help spelling 'scr
 
 c=$(copy unclaimed)
 # The proxy is gated on the claim: a script that does not claim 3.2 may use bash 4
-sed 's/^# Nothing here reaches the network. Needs bash 3.2 and POSIX tools only.$/# Nothing here reaches the network./' "$c/script.sh" >"$c/s" && mv "$c/s" "$c/script.sh"
+# The claim as the check finds it, not the template's whole line, which is then free to change
+sed 's/^\(# .*\)Needs bash 3\.2.*$/\1Needs bash 4./' "$c/script.sh" >"$c/s" && mv "$c/s" "$c/script.sh"
 plant "$c" 'HERE=' 'false && declar'"e -A m"
 # shellcheck disable=SC2046
 nested "$c" $(full "$c") >/dev/null 2>&1 || die "self-test: a bash 4 construct was flagged in a script that claims no bash 3.2"
@@ -976,6 +1009,21 @@ c=$(copy comp-action)
 awk '/^  local -a subcommands$/ { skip = 1 } skip && /^  \)$/ { skip = 0; next } skip { next } { print }' "$canon/_script.sh" |
   sed "s/'1:subcommand:->subcommand'/'1:subcommand:(run stop help)'/; s/subcommand) _describe 'subcommand' subcommands ;;/subcommand) ;;/" >"$c/_script.sh"
 expect_green "$c" "a zsh completion offering its subcommands as an action list" -n script.sh -c "$c/script.sh.bash" "$c/_script.sh" "$c/script.sh"
+
+c=$(copy heredoc-in-quotes)
+# A `<<WORD` inside quotes is text, not a heredoc: read as one, it blanked the rest of the
+# file, and every subcommand and flag after it vanished from what the checker saw, so
+# the readme named subcommands the script no longer had
+plant "$c" 'HERE=' "note=\"cat <<'NOPE' is text\""
+plant "$c" 'HERE=' "note='and so is <<NOPE'"
+# shellcheck disable=SC2046
+expect_green "$c" "a copy holding <<WORD inside quotes" $(full "$c")
+
+c=$(copy literal-bash4)
+# A bash 4 construct inside single quotes is text, which a 3.2 parses happily: the proxy
+# reads what a script would run, and a single-quoted string runs nothing
+plant "$c" 'HERE=' "note='declar""e -A is bash 4'"
+expect_green "$c" "a copy naming a bash 4 construct inside single quotes" -n script.sh "$c/script.sh"
 
 c=$(copy claimed-bash4)
 plant "$c" 'HERE=' 'false && declar'"e -A m"
