@@ -4,42 +4,47 @@
 # its parsers take, every variable it reads and every code it exits with must be in the
 # help — and every document and completion that restates a list is held to the same code,
 # in both directions. Each check is proven able to fail on every run, on a canonical
-# script with one defect planted, so a copy of this file falsifies itself wherever it runs.
+# script with one defect planted, so a copy of this file falsifies itself wherever it runs
 #
-#   check-sh.sh [-n NAME] [-e PREFIX] [-d DOC]... [-m DOC]... [-c BASH ZSH] SCRIPT
-#   check-sh.sh --template [script|bash|zsh]
-#
-#   -n NAME      what the help, the docs and the completions call the script (default:
-#                the script's basename)
-#   -e PREFIX    the script reads environment variables with this prefix; each must be
-#                in the help
-#   -d DOC       a document that lists the script's subcommands, checked both ways: every
-#                subcommand named, and every `NAME word` it spells real; repeatable
-#   -m DOC       a document that mentions only some of them and sends the reader to the
-#                help for the rest: every `NAME word` it spells must be real; repeatable
-#   -c BASH ZSH  the two completion files, checked both ways
-#   --template   print the canonical script, or its bash or zsh completion, and exit
-#
-# The shapes it reads are the standard's own: a `case "$cmd"` dispatcher at the top level
-# with `-h | --help | help)` and a `*)` arm that sends usage to stderr, flag arms such as
-# `-n | --dry-run)` inside cmd_<sub>() functions or at the top level, literal `exit N`,
-# and the help as the header of the file or a `help [SUB]` subcommand. They are spelled
-# out in references/shape.md and help.md of
-# https://github.com/rokokol/bash-best-practices-skill. A header line claiming
-# "Needs bash 3.2" turns on a grep for constructs newer than 3.2 or absent from a BSD
-# userland; a grep is a proxy, and the proof is a run under the real 3.2.
-#
-# Exit 0 when everything agrees, 1 with one `check-sh: <what>` line per finding, 2 on a
-# usage error, an unreadable file, a --help that fails, or a script with nothing to check.
+# It has no repo-specific part: another repository takes it through the vendoring cascade
+# (references/bump-cascade.md in https://github.com/rokokol/ci-skill), never edits its copy
+# in place, and calls it from its own gate. What it accepts is usage() below, and nowhere
+# else
 # Nothing here reaches the network. Needs bash 3.2 and POSIX tools only, so it runs on a
-# macOS runner unchanged. It has no repo-specific part: another repository takes it
-# through the vendoring cascade (references/bump-cascade.md in
-# https://github.com/rokokol/ci-skill), never edits its copy in place, and calls it from
-# its own gate.
+# macOS runner unchanged
 set -euo pipefail
 
-# The whole header, however long it grows: up to the first line that is not a comment
-usage() { sed -n '2,/^[^#]/p' "${BASH_SOURCE[0]}" | sed '$d; s/^# \{0,1\}//'; }
+usage() {
+  cat <<'EOF'
+check-sh.sh — holds a shell script's help, documents and completions to its code
+
+  check-sh.sh [-n NAME] [-e PREFIX] [-d DOC]... [-m DOC]... [-c BASH ZSH] SCRIPT
+  check-sh.sh --template [script|bash|zsh]
+
+  -n NAME      what the help, the docs and the completions call the script (default:
+               the script's basename)
+  -e PREFIX    the script reads environment variables with this prefix; each must be
+               in the help
+  -d DOC       a document that lists the script's subcommands, checked both ways: every
+               subcommand named, and every `NAME word` it spells real; repeatable
+  -m DOC       a document that mentions only some of them and sends the reader to the
+               help for the rest: every `NAME word` it spells must be real; repeatable
+  -c BASH ZSH  the two completion files, checked both ways
+  --template   print the canonical script, or its bash or zsh completion, and exit
+
+The shapes it reads are the standard's own: a `case "$cmd"` dispatcher at the top level
+with `-h | --help | help)` and a `*)` arm that sends usage to stderr, flag arms such as
+`-n | --dry-run)` inside cmd_<sub>() functions or at the top level, literal `exit N`, a
+help printed from a heredoc or by a `help [SUB]` subcommand, and a header comment that
+makes claims and lists nothing. They are spelled out in references/shape.md and help.md
+of https://github.com/rokokol/bash-best-practices-skill. A header line claiming "Needs
+bash 3.2" turns on a grep for constructs newer than 3.2 or absent from a BSD userland; a
+grep is a proxy, and the proof is a run under the real 3.2
+
+Exit 0 when everything agrees, 1 with one `check-sh: <what>` line per finding, 2 on a
+usage error, an unreadable file, a --help that fails, or a script with nothing to check
+EOF
+}
 
 self=$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)/$(basename -- "${BASH_SOURCE[0]}")
 
@@ -53,23 +58,27 @@ die() { # a usage error, never a finding
 # shape the checker proves itself on and the shape it hands out are one text.
 
 template_script() {
-  cat <<'EOF'
+  cat <<'TEMPLATE'
 #!/usr/bin/env bash
-# script.sh — one line saying what it is, in the shape every script of the family has.
-#
-#   script.sh run [-n|--dry-run] [-l DIR]    do the thing, in DIR
-#   script.sh stop                           stop doing it
-#
-#   -n, --dry-run   say what would be done and do nothing
-#   -l DIR          the log directory (default: $SCRIPT_LOGDIR, else the current one)
-#
-# Environment: SCRIPT_LOGDIR is the log directory when -l is not given.
-# Exit 0 done, 1 when the thing asked about is wrong, 2 on a usage error.
+# What a maintainer needs and a caller does not: why the script exists, where it comes
+# from, what it must never do. What it accepts is usage() below, and nowhere else
 # Nothing here reaches the network. Needs bash 3.2 and POSIX tools only.
 set -euo pipefail
 
-# The whole header, however long it grows: up to the first line that is not a comment
-usage() { sed -n '2,/^[^#]/p' "${BASH_SOURCE[0]}" | sed '$d; s/^# \{0,1\}//'; }
+usage() {
+  cat <<'EOF'
+script.sh — one line saying what it is, in the shape every script of the family has
+
+  script.sh run [-n|--dry-run] [-l DIR]    do the thing, in DIR
+  script.sh stop                           stop doing it
+
+  -n, --dry-run   say what would be done and do nothing
+  -l DIR          the log directory (default: $SCRIPT_LOGDIR, else the current one)
+
+Environment: SCRIPT_LOGDIR is the log directory when -l is not given
+Exit 0 done, 1 when the thing asked about is wrong, 2 on a usage error
+EOF
+}
 
 fail() { # the thing asked about is wrong
   printf 'script.sh: %s\n' "$1" >&2
@@ -131,7 +140,7 @@ case "$cmd" in
     exit 2
     ;;
 esac
-EOF
+TEMPLATE
 }
 
 template_bash() {
@@ -498,20 +507,35 @@ while IFS= read -r hit; do
   finding "$script:$hit — \${N:?} exits 1 with bash's message, where a missing argument is a usage error; guard it with ((\$# >= N)) || die"
 done < <(grep -nE '\$\{[0-9]+:[?]' "$code" | grep -vE '^[0-9]+:[[:space:]]*#' | sed 's/^\([0-9]*\):[[:space:]]*/\1 has: /' || :)
 
+# ---- the header comment lists nothing ---------------------------------------------
+# It says why the script exists and makes the claims; what the script accepts is the
+# help's alone. A second list beside the help falls behind it — t.sh's header did, by
+# three subcommands, before anyone noticed. A line the help's grammar would read as a
+# usage, flag or code row, or an Exit or Environment line, is such a list
+while IFS= read -r row; do
+  [[ -n "$row" ]] || continue
+  finding "$name's header comment carries a line that belongs to the help alone: $row"
+done < <(printf '%s\n' "$header" | sed 's/^# \{0,1\}//' |
+  grep -E "^ +(${name_re} |--?[a-zA-Z]|[0-9]+  )|^Exit[ :]+[0-9]|^Environment:" || :)
+
 # ---- the help ---------------------------------------------------------------------
 if ((! proxy_only)); then
   # Run under the bash running this checker, not the one the shebang finds: on a macOS
   # runner that is the 3.2 the claim is about
   help=$("$BASH" "$script" --help 2>&1) || die "$name --help exited $? rather than printing the help:"$'\n'"$help"
   [[ -n "$help" ]] || die "$name --help printed nothing"
-  # A help printed from a fixed line range of the header stops short the day the header
-  # grows; the open-ended form reads up to the first line that is not a comment
-  if grep -qE 'sed -n '"'"'[0-9]+,[0-9]+p'"'"' "\$\{BASH_SOURCE' "$script"; then
-    finding "$name's usage() prints a fixed line range of its header, which the header will outgrow"
-  elif grep -qE '2,/\^\[\^#\]/p|!/\^#/ \{ exit \}' "$script"; then
-    last=$(printf '%s\n' "$header" | tail -n 1 | sed 's/^# \{0,1\}//')
-    [[ "$(printf '%s\n' "$help" | tail -n 1)" == "$last" ]] ||
-      finding "$name --help stops before the end of its own header, whose last line is: $last"
+  # The help again, through the pipe `bash <(curl …)` hands bash. bash reads a script from
+  # a pipe no further than the command it runs, so a script that reads its own file finds
+  # only what follows that command: nothing when the dispatcher is last, which prints an
+  # empty help at exit 0, and the rest of its program otherwise (pitfalls.md); a heredoc
+  # is code bash has already read. A run that fails outright is a script that needs the files beside
+  # it, which says so and is no finding. The grep only names the line: `$0` is also awk's
+  # record, so no grep can decide the question, and the pipe can. A whole single-quoted
+  # word is skipped as one, since an awk program holds the `;` and `$` that end a match
+  if piped=$("$BASH" <(cat "$script") --help 2>&1) && [[ "$piped" != "$help" ]]; then
+    self_read='(sed|awk|head|tail|cat|grep|cut)[[:space:]]([^|;&$'"'"']|'"'"'[^'"'"']*'"'"')*"\$\{BASH_SOURC[E](\[0\])?\}"'
+    where=$(grep -nE "$self_read" "$code" | grep -vE '^[0-9]+:[[:space:]]*#' | head -n 1 | sed 's/^\([0-9]*\):[[:space:]]*/ — line \1 has: /' || :)
+    finding "$name --help prints other text through a pipe than from the file, at exit 0: under bash <(…) it reads its own source${where:-, by a path no grep here can name}; print the help from a heredoc"
   fi
   # Per-subcommand help, where the script has it: `help SUB` for each help_<sub>() it
   # defines. Its flags are then looked for there rather than in the general help
@@ -715,6 +739,16 @@ expect_red() { # expect_red DIR FRAGMENT WHAT [ARGS...]
   esac
   planted=$((planted + 1))
 }
+# A copy that must pass is run once, and that run's own output and status are the report.
+# A second run for the message would describe itself: a failure that does not repeat left
+# an empty reason on a macOS runner, and nothing to find the cause by
+expect_green() { # expect_green DIR WHAT [ARGS...]
+  local d="$1" what="$2" out status=0
+  shift 2
+  out=$(nested "$d" "$@" 2>&1) || status=$?
+  ((status == 0)) ||
+    die "self-test: $what was rejected with exit $status — the checker is broken, not the script:"$'\n'"$out"
+}
 # The constructs planted below are spelled in two halves, so this file's own claim of
 # bash 3.2 is not contradicted by its own self-test
 # Through the environment rather than -v: awk reads escape sequences in a -v value, so a
@@ -727,11 +761,14 @@ swap() { # swap DIR PATTERN LINE -> the first line starting with PATTERN replace
   PAT="$2" LINE="$3" awk '!done && index($0, ENVIRON["PAT"]) == 1 { print ENVIRON["LINE"]; done = 1; next } { print }' "$1/script.sh" >"$1/script.sh.new"
   mv "$1/script.sh.new" "$1/script.sh"
 }
+replace_usage() { # replace_usage DIR LINE -> usage() and its heredoc replaced by LINE
+  LINE="$2" awk '/^usage\(\) \{$/ { print ENVIRON["LINE"]; skip = 1; next } skip && /^}$/ { skip = 0; next } skip { next } { print }' "$1/script.sh" >"$1/script.sh.new"
+  mv "$1/script.sh.new" "$1/script.sh"
+}
 
 c=$(copy faithful)
 # shellcheck disable=SC2046 # full() prints the arguments, split on purpose
-nested "$c" $(full "$c") >/dev/null 2>&1 ||
-  die "self-test: the canonical script was rejected — the checker is broken, not the script:"$'\n'"$(nested "$c" $(full "$c") 2>&1 || :)"
+expect_green "$c" "the canonical script" $(full "$c")
 
 c=$(copy nothing)
 printf '#!/usr/bin/env bash\necho hi\n' >"$c/script.sh"
@@ -760,15 +797,15 @@ c=$(copy wrapper)
 # A dispatcher whose *) arm passes the word through is a wrapper, and a wrapper's help may
 # name the commands of the tool behind it
 awk '/^  \*\)$/ { print "  *) printf '"'"'passing %s through\\n'"'"' \"$cmd\" ;; # pass-through"; skip = 1; next } skip && /^    ;;$/ { skip = 0; next } skip { next } { print }' "$c/script.sh" >"$c/s" && mv "$c/s" "$c/script.sh"
-plant "$c" '#   script.sh stop' '#   script.sh anything                       passed through to the tool behind'
+plant "$c" '  script.sh stop' '  script.sh anything                       passed through to the tool behind'
 # shellcheck disable=SC2016 # the backticks are markdown, not a command substitution
 printf '\nAlso `script.sh anything` goes through\n' >>"$c/README.md"
 # shellcheck disable=SC2046
-nested "$c" $(full "$c") >/dev/null 2>&1 || die "self-test: a wrapper's help naming a passed-through command was rejected:"$'\n'"$(nested "$c" $(full "$c") 2>&1 || :)"
+expect_green "$c" "a wrapper's help naming a passed-through command" $(full "$c")
 
 c=$(copy bracketed)
 # A global option in brackets between the name and the subcommand is still `NAME sub`
-swap "$c" '#   script.sh stop' '#   script.sh [--quiet] stop                 stop doing it'
+swap "$c" '  script.sh stop' '  script.sh [--quiet] stop                 stop doing it'
 # shellcheck disable=SC2046
 nested "$c" $(full "$c") >/dev/null 2>&1 || die "self-test: a help spelling 'script.sh [--quiet] stop' was read as not naming stop"
 
@@ -785,7 +822,7 @@ plant "$c" 'case "$cmd" in' '  planted) : ;;'
 expect_red "$c" "dispatches 'planted' but its help never mentions 'script.sh planted'" "a subcommand missing from the help" -n script.sh "$c/script.sh"
 
 c=$(copy ghost-sub)
-plant "$c" '#   script.sh stop' '#   script.sh ghost                          a subcommand that is not there'
+plant "$c" '  script.sh stop' '  script.sh ghost                          a subcommand that is not there'
 expect_red "$c" "help lists 'script.sh ghost', which the dispatcher does not have" "a subcommand the help invents" -n script.sh "$c/script.sh"
 
 c=$(copy new-flag)
@@ -794,7 +831,7 @@ plant "$c" '    case "$1" in' '      --planted) shift ;;'
 expect_red "$c" "script.sh run accepts --planted but its help never mentions it" "a flag missing from the help" -n script.sh "$c/script.sh"
 
 c=$(copy ghost-flag)
-plant "$c" '#   -l DIR' '#   --ghost         a flag no parser accepts'
+plant "$c" '  -l DIR' '  --ghost         a flag no parser accepts'
 expect_red "$c" "help has a row for --ghost, which no parser accepts" "a flag the help invents" -n script.sh "$c/script.sh"
 
 c=$(copy new-variable)
@@ -809,16 +846,46 @@ c=$(copy new-code)
 plant "$c" 'HERE=' 'false && exi'"t 97"
 expect_red "$c" "exits 97 but its help never lists 97" "an exit code missing from the help" -n script.sh "$c/script.sh"
 
-c=$(copy fixed-range)
+c=$(copy self-read-sed)
+# A usage() printing its help back out of its own file, as the family's did. The text is
+# the canon's own help as `#>` lines under the shebang, so from the file every other
+# check passes, and `#>` is no row the header check reads. Through a pipe bash has read
+# those lines long before the dispatcher runs, so the reader finds them gone and prints
+# nothing at exit 0. Spelled in two halves so this file's own source reads nothing of
+# itself
+canon_help=$("$BASH" "$canon/script.sh" --help | sed 's/^/#> /')
 # shellcheck disable=SC2016 # the expansion belongs to the usage() being written out
-swap "$c" 'usage() {' 'usage() { sed -n '"'"'2,3p'"'"' "${BASH_SOURCE[0]}" | sed '"'"'s/^# \{0,1\}//'"'"'; }'
-expect_red "$c" "prints a fixed line range" "a usage() over a fixed line range" -n script.sh "$c/script.sh"
+replace_usage "$c" 'usage() { sed -n '"'"'s/^#> \{0,1\}//p'"'"' "${BASH_SOUR''CE[0]}"; }'
+plant "$c" '#!/usr/bin/env bash' "$canon_help"
+expect_red "$c" "has: usage() { sed -n" "a usage() printing its help back with sed" -n script.sh "$c/script.sh"
 
-c=$(copy short-help)
-# The header-extracted usage that stops early: the open-ended sed, then one line dropped
+c=$(copy self-read-dollar0)
+# $0 names the file too, and in awk it is also the record, so no grep can tell the two
+# apart; the pipe can. The finding carries no line then, and the fragment says so
 # shellcheck disable=SC2016 # the expansion belongs to the usage() being written out
-swap "$c" 'usage() {' 'usage() { sed -n '"'"'2,/^[^#]/p'"'"' "${BASH_SOURCE[0]}" | sed '"'"'$d'"'"' | sed '"'"'$d; s/^# \{0,1\}//'"'"'; }'
-expect_red "$c" "stops before the end of its own header" "a help that stops before the header's end" -n script.sh "$c/script.sh"
+replace_usage "$c" 'usage() { awk '"'"'sub(/^#> ?/, "")'"'"' "$0"; }'
+plant "$c" '#!/usr/bin/env bash' "$canon_help"
+expect_red "$c" "it reads its own source, by a path no grep here can name" "a usage() printing its help back with awk on \$0" -n script.sh "$c/script.sh"
+
+c=$(copy needs-its-directory)
+# A script that needs a file beside it fails outright through a pipe: that is no finding,
+# since it cannot run that way at all and says so
+# shellcheck disable=SC2016 # the expansion belongs to the script being written out
+plant "$c" 'HERE=' 'cat "$HERE/script.sh.bash" >/dev/null'
+# shellcheck disable=SC2046
+expect_green "$c" "a script that fails outright through a pipe" $(full "$c")
+
+c=$(copy header-usage)
+plant "$c" '#!/usr/bin/env bash' '#   script.sh stop                           stop doing it'
+expect_red "$c" "belongs to the help alone:   script.sh stop" "a usage line in the header comment" -n script.sh "$c/script.sh"
+
+c=$(copy header-flag)
+plant "$c" '#!/usr/bin/env bash' '#   -l DIR          the log directory'
+expect_red "$c" "belongs to the help alone:   -l DIR" "a flag row in the header comment" -n script.sh "$c/script.sh"
+
+c=$(copy header-exit)
+plant "$c" '#!/usr/bin/env bash' '# Exit 0 done, 2 on a usage error'
+expect_red "$c" "belongs to the help alone: Exit 0" "an Exit line in the header comment" -n script.sh "$c/script.sh"
 
 c=$(copy no-help-arm)
 swap "$c" '  -h | --help | help) usage ;;' '  --help) usage ;;'
@@ -892,8 +959,7 @@ c=$(copy comp-wrapped-list)
 # The last line of an offered list wrapped onto two ends in `)` inside a case arm, and is
 # still an offer rather than a pattern: two consumers wrap their flag arrays this way
 awk '/words="-n --dry-run -l"/ { sub(/words="-n --dry-run -l"/, "local -a w=(-n"); print; print "          --dry-run -l)"; next } { print }' "$canon/script.sh.bash" >"$c/script.sh.bash"
-nested "$c" -n script.sh -c "$c/script.sh.bash" "$c/_script.sh" "$c/script.sh" >/dev/null 2>&1 ||
-  die "self-test: a flag list wrapped onto a second line ending in ) was read as a case pattern:"$'\n'"$(nested "$c" -n script.sh -c "$c/script.sh.bash" "$c/_script.sh" "$c/script.sh" 2>&1 || :)"
+expect_green "$c" "a flag list wrapped onto a second line ending in )" -n script.sh -c "$c/script.sh.bash" "$c/_script.sh" "$c/script.sh"
 
 c=$(copy comp-dialect)
 tail -n +2 "$canon/script.sh.bash" >"$c/script.sh.bash"
@@ -909,8 +975,7 @@ c=$(copy comp-action)
 # The action of an `N:message:action` spec is what zsh offers, and it counts
 awk '/^  local -a subcommands$/ { skip = 1 } skip && /^  \)$/ { skip = 0; next } skip { next } { print }' "$canon/_script.sh" |
   sed "s/'1:subcommand:->subcommand'/'1:subcommand:(run stop help)'/; s/subcommand) _describe 'subcommand' subcommands ;;/subcommand) ;;/" >"$c/_script.sh"
-nested "$c" -n script.sh -c "$c/script.sh.bash" "$c/_script.sh" "$c/script.sh" >/dev/null 2>&1 ||
-  die "self-test: a zsh completion offering its subcommands as an action list was rejected:"$'\n'"$(nested "$c" -n script.sh -c "$c/script.sh.bash" "$c/_script.sh" "$c/script.sh" 2>&1 || :)"
+expect_green "$c" "a zsh completion offering its subcommands as an action list" -n script.sh -c "$c/script.sh.bash" "$c/_script.sh" "$c/script.sh"
 
 c=$(copy claimed-bash4)
 plant "$c" 'HERE=' 'false && declar'"e -A m"
