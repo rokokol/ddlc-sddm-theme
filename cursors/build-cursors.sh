@@ -1,12 +1,13 @@
 #!/usr/bin/env bash
-# Regenerate cursors/theme/ from the two source frames. Maintainer tool — the built theme is
-# committed, so installing needs neither ImageMagick nor xcursorgen. Rerun this only when
-# assets/sayori-head*.png change
 set -euo pipefail
 
 usage() {
-  cat <<EOF
+  cat <<'EOF'
 Usage: build-cursors.sh [output-dir]
+
+Regenerate cursors/theme/ from the two source frames. Maintainer tool — the built theme is
+committed, so installing needs neither ImageMagick nor xcursorgen. Rerun this only when
+assets/sayori-head*.png change
 
 Rebuilds the XCursor theme (cursors/ plus index.theme) in place, or into <output-dir>
 

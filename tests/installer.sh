@@ -1,10 +1,26 @@
 #!/usr/bin/env bash
-# The fast suite for install.sh: flag surface, the manifest contract, the per-component
-# sweep, selective uninstall, the declarative --no-configure, staging, and the refusal
-# path — everything that needs no container. This is the installer's contract only: the
-# theme itself is QML the greeter runs, and `nix run .#preview` is how that gets looked
-# at (see CLAUDE.md)
+# This is the installer's contract only: the theme itself is QML the greeter runs, and
+# `nix run .#preview` is how that gets looked at (see CLAUDE.md)
 set -euo pipefail
+
+usage() {
+  cat <<'EOF'
+tests/installer.sh — the fast suite for install.sh: flag surface, the manifest
+contract, the per-component sweep, selective uninstall, the declarative
+--no-configure, staging, and the refusal path — everything that needs no container
+
+  tests/installer.sh [REPO]
+
+REPO is the checkout to install from (default: the one this script lives in)
+
+Nothing here reaches the network
+Exit: 0 all passed, 1 a check failed
+EOF
+}
+[[ "${1:-}" == "-h" || "${1:-}" == "--help" || "${1:-}" == "help" ]] && {
+  usage
+  exit 0
+}
 
 HERE=$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)
 REPO="${1:-$(dirname "$HERE")}"
