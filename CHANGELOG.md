@@ -8,6 +8,8 @@ Kept in the shape of [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), v
 
 - `install.sh` now exits 2, not 1, on a usage error — an unknown flag, a relative `--prefix`, an invalid `--component` value, or `--uninstall` combined with a configuration flag — and `--help` ends with the `Exit` sentence naming every code it can produce; a missing dependency in the preflight still exits 1
 - the installer's completions are now drift-checked against `install.sh` by the vendored [bash-best-practices](https://github.com/rokokol/bash-best-practices-skill) `check-sh.sh -c`, replacing `tests/check-completions.sh`
+- `install.sh --help` no longer says three times over what it installs, nor twice that everything ships prebuilt and that the components are additive: what it copies is listed once, "no build tools needed" stays beside the file list where it is acted on, and the additive rule sits with the paragraph about re-running a component
+- `cursors/build-cursors.sh --help` describes the rebuild once, with the `<output-dir>` case folded into it, instead of stating it again a paragraph later
 - `cursors/build-cursors.sh` and `install.sh` move their header's caller-facing paragraph into `--help`, leaving the header to editor-only notes. `tests/installer.sh -h|--help|help` now documents the suite, including that it reaches no network
 
 ## [1.1.0] - 2026-09-01

@@ -15,13 +15,11 @@ usage() {
 install the ddlc-sddm-theme $VERSION login screen and cursors
 
 Install the DDLC theme on a non-NixOS system. NixOS users take the flake instead — see
-README. Everything ships prebuilt: this copies the theme and cursor trees under a
-prefix, selects them in SDDM, and records every path it wrote in an install-manifest
-that --uninstall consumes. Components are additive: installing one never touches the
-other, and --uninstall --component takes one back out on its own
+README. This copies the theme and cursor trees under a prefix, selects them in SDDM, and
+records every path it wrote in an install-manifest that --uninstall consumes
 
-Installs the theme, the prebuilt cursors and selects both in SDDM. No flags needed.
-Re-running a component converges it: a file a previous install of that component wrote
+No flags needed, and the components are additive: --uninstall --component takes one back
+out on its own. Re-running a component converges it: a file a previous install of it wrote
 and this run does not is removed — running with --no-configure removes a previously
 written SDDM config the same way. The other component is never touched
 
