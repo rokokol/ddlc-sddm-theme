@@ -1,4 +1,10 @@
 #!/usr/bin/env bash
+# Follows the huix-standard installer grammar: references/install-sh.md in
+# https://github.com/rokokol/huix-standard-skill — declarative, so a new boolean needs its
+# undo in the sweep as much as its effect; every path created belongs in the manifest
+# --uninstall consumes; the preflight installs nothing and prints `  $ command` lines
+# tests/distro.sh executes verbatim; a new flag updates both completions/ files in the same
+# commit, or check-sh.sh -c fails the flake check
 set -euo pipefail
 
 here="$(cd -- "$(dirname -- "$(readlink -f "${BASH_SOURCE[0]}")")" && pwd)"
