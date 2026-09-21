@@ -238,7 +238,11 @@
             pkgs.runCommand "installer-suite"
               {
                 # tests/installer.sh builds a deliberately install(1)-less PATH of these
-                nativeBuildInputs = [ pkgs.coreutils ];
+                nativeBuildInputs = [
+                  pkgs.coreutils
+                  pkgs.jq
+                  pkgs.shfmt
+                ];
               }
               ''
                 mkdir -p repo/tests
