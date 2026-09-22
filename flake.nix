@@ -82,7 +82,7 @@
           program = pkgs.lib.getExe (
             pkgs.writeShellApplication {
               name = "preview";
-              runtimeInputs = [ pkgs.kdePackages.sddm ];
+              runtimeInputs = with pkgs; [ kdePackages.sddm ];
               text = ''
                 echo "F8 fakes a wrong password — three presses reach the easter egg"
                 # The session's own QML/plugin paths shadow the greeter's Qt and it fails to start
@@ -103,7 +103,7 @@
       checks = forAllSystems (
         pkgs:
         let
-          lib = nixpkgs.lib;
+          inherit (nixpkgs) lib;
           inherit (self.packages.${pkgs.stdenv.hostPlatform.system}) sddm-ddlc-theme sayori-cursors;
         in
         {
@@ -148,7 +148,7 @@
             in
             pkgs.runCommand "module-wiring"
               {
-                nativeBuildInputs = [ pkgs.jq ];
+                nativeBuildInputs = with pkgs; [ jq ];
                 dump = builtins.toJSON wiring;
                 passAsFile = [ "dump" ];
               }
@@ -200,15 +200,15 @@
           scripts-lint =
             pkgs.runCommand "scripts-lint"
               {
-                nativeBuildInputs = [
+                nativeBuildInputs = with pkgs; [
                   # check-sh.sh below is moving to reading the script it is given as a tree,
                   # out of `shfmt --to-json`, with jq flattening that tree into rows. This
                   # sandbox has a scrubbed PATH, so the dev shell's jq is not reachable here
                   # and the tool has to be named on this derivation
-                  pkgs.jq
-                  pkgs.shellcheck
-                  pkgs.shfmt
-                  pkgs.zsh
+                  jq
+                  shellcheck
+                  shfmt
+                  zsh
                 ];
               }
               ''
@@ -238,10 +238,10 @@
             pkgs.runCommand "installer-suite"
               {
                 # tests/installer.sh builds a deliberately install(1)-less PATH of these
-                nativeBuildInputs = [
-                  pkgs.coreutils
-                  pkgs.jq
-                  pkgs.shfmt
+                nativeBuildInputs = with pkgs; [
+                  coreutils
+                  jq
+                  shfmt
                 ];
               }
               ''
@@ -274,7 +274,7 @@
             in
             pkgs.runCommand "nixos-eval"
               {
-                nativeBuildInputs = [ pkgs.jq ];
+                nativeBuildInputs = with pkgs; [ jq ];
                 dump = builtins.toJSON real;
                 passAsFile = [ "dump" ];
               }
