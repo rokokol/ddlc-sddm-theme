@@ -15,7 +15,7 @@
 
 let
   # The smallest config nixpkgs will call a system: without a root filesystem and a bootloader
-  # decision, evaluation stops before it reaches anything of ours
+  # decision, evaluation stops before it reaches anything the module defines
   base = {
     nixpkgs.hostPlatform = system;
     boot.loader.grub.enable = false;
