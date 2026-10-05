@@ -338,6 +338,15 @@ def word_text:
   elif (.Parts // []) | length == 0 then ""
   else ([.Parts[] | part_text] | if any(. == null) then "$" else join("") end) end;
 
+# A pattern as bash matches it: an unquoted part is a glob, and a quoted or expanded part
+# is literal text, so it becomes `_`, which no bracket range can use as an end
+def glob_text:
+  [(.Parts // [])[]
+   | if .Type == "Lit" then .Value
+     elif .Type == "ExtGlob" then .Op + (.Pattern.Value // "") + ")"
+     else "_" end]
+  | join("") | if . == "" then "-" else . end;
+
 # `"$cmd"` is a DblQuoted holding a ParamExp; `$cmd` is the ParamExp bare
 def case_word:
   (.Parts[0] // {}) as $p
@@ -377,6 +386,9 @@ def emit($fn; $subst):
             (if (.Op // ";;") != ";;"
              then [.Pos.Line, "armop", $fn, $subst, ($c | tostring), .Op, "-"]
              else empty end),
+            # One row per pattern, read as a glob: the arm row above keeps quoted text,
+            # which bash matches literally, so a bracket range in it is not one
+            (.Patterns[]? | [.Pos.Line, "glob", $fn, $subst, "-", glob_text, "-"]),
             (.Stmts | emit($fn; $subst))))
 
     # SUBST is 1 inside $( ) and < ( ) and stays 0 inside backticks, which is the bash 3.2
@@ -416,6 +428,10 @@ def emit($fn; $subst):
     # pattern over text has to tell it from the same two characters inside a string
     elif .Type == "UnaryTest" or .Type == "BinaryTest" then
       [.OpPos.Line, "test", $fn, $subst, "-", (.Op // "-"), "-"],
+      # The right side of ==, = and != is a pattern, the same glob a case arm holds
+      (if .Op == "==" or .Op == "=" or .Op == "!="
+       then [.Y.Pos.Line, "glob", $fn, $subst, "-", (.Y | glob_text), "-"]
+       else empty end),
       (to_entries[] | .value | emit($fn; $subst))
 
     # declare, local, typeset, export and readonly are a clause of their own and not a
@@ -518,7 +534,7 @@ tree_probe() {
 declare -A m
 f() {
   case "$1" in
-    -n | --dry) echo "x" ;;&
+    -n | "[a-z]"[a-z]) echo "x" ;;&
   esac
   cat <<'HD'
 body
@@ -526,7 +542,7 @@ HD
   g="${2:?need}"
   h=$(printf '%s' ok)
   echo a | grep -q b
-  [[ -v g ]]
+  [[ -v g && $g != *[!a-z]* ]]
   i="${g:1:-2}${g//x/"y"}"
 }
 PROBE
@@ -543,8 +559,10 @@ tree_golden() {
 3	assign	-	0	-	m	-
 4	func	-	0	-	f	16
 5	case	f	0	-	$1	7
-6	arm	f	0	5	-n|--dry	6
+6	arm	f	0	5	-n|[a-z][a-z]	6
 6	armop	f	0	5	;;&	-
+6	glob	f	0	-	-n	-
+6	glob	f	0	-	_[a-z]	-
 6	call	f	0	-	echo	x
 8	call	f	0	-	cat	-
 8	redir	f	0	-	<<	HD
@@ -558,7 +576,11 @@ tree_golden() {
 13	pipeinto	f	0	-	grep	-q b
 13	call	f	0	-	echo	a
 13	call	f	0	-	grep	-q b
+14	test	f	0	-	&&	-
 14	test	f	0	-	-v	-
+14	test	f	0	-	!=	-
+14	glob	f	0	-	*[!a-z]*	-
+14	param	f	0	-	g	-
 15	call	f	0	-	-	-
 15	assign	f	0	-	i	$
 15	param	f	0	-	g	slice-neg
@@ -841,6 +863,9 @@ known_flag() { # known_flag FLAG [SUB] -> 0 when SUB (or any parser) accepts it,
 # proving a bash is 3.2 has to write that sentence — so those are matched where quoted text
 # is blanked. `exp` is an expansion, which double quotes do not suppress: `echo "${v,,}"`
 # lowercases at runtime, so those keep reading inside them
+# A letter range in a glob parses under every bash and matches different text: before 5.0
+# it follows the locale's collation, where en_US.UTF-8 puts H inside [a-z].
+# 5.0 turned globasciiranges on by default, so 5.0 is the floor of the ASCII reading
 version_rows() {
   cat <<'ROWS'
 400	call	mapfile	.
@@ -857,6 +882,7 @@ version_rows() {
 403	decl	declare|local|typeset	n
 403	call	wait	(^| )-n( |$)
 404	param	.	^@[QEPAaKk]$
+500	glob	(^|[^\\])\[([^]]|\[:[a-z]+:\])*[A-Za-z]-[A-Za-z]	.
 502	param	.	^repl-quoted$|^repl-amp$
 bsd	call	^sort$	(^| )-[A-Za-z]*V
 bsd	call	^grep$	(^| )-[A-Za-z]*P
@@ -1267,7 +1293,7 @@ doc_mentions_are_real() { # doc_mentions_are_real DOC -> a finding per mention t
     while (($#)); do
       case "$1" in
         --) break ;;
-        -[a-zA-Z]* | --[a-zA-Z]*)
+        -[[:alpha:]]* | --[[:alpha:]]*)
           flag="${1%%=*}"
           known_flag "$flag" "$sub" ||
             finding "$doc gives \`$name${sub:+ $sub}\` the flag $flag, which it does not parse"
@@ -1763,6 +1789,20 @@ c=$(copy claimed-gnu-mktemp)
 # shellcheck disable=SC2016 # the substitution belongs to the script being written out
 plant "$c" 'HERE=' 'x=$(mktemp -d -p /tmp)'
 expect_red "$c" "has: x=\$(mktemp -d -p /tmp)" "a GNU mktemp flag under a 3.2 claim" -n script.sh "$c/script.sh"
+
+c=$(copy claimed-letter-range)
+# shellcheck disable=SC2016 # the $1 belongs to the script being written out
+plant "$c" 'HERE=' 'case "${1-}" in [a-z]*) : ;; esac'
+expect_red "$c" "has: case \"\${1-}\" in [a-z]*) : ;; esac" "a letter range in a case pattern under a 3.2 claim" -n script.sh "$c/script.sh"
+
+c=$(copy letter-range-not-glob)
+# A range bash does not match as a glob: quoted, escaped, a class, a regex after =~, and
+# the argument of a tool, which follows that tool's rules and not bash's
+# shellcheck disable=SC2016 # the $1 belongs to the script being written out
+plant "$c" 'HERE=' 'case "${1-}" in "[a-z]" | \[a-z] | [[:lower:]]*) : ;; esac
+[[ "${1-}" == "[A-Z]"* || "${1-}" =~ ^[a-z]+$ ]] || :
+printf "%s\n" "${1-}" | tr a-z A-Z | grep "[A-Z]" >/dev/null || :'
+expect_green "$c" "a copy whose letter ranges are quoted, escaped, a regex or a tool's argument" -n script.sh "$c/script.sh"
 
 c=$(copy unnamed-tool)
 # A tool that is neither a builtin nor a POSIX utility, called by a script whose header
