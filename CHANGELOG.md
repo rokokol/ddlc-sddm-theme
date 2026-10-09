@@ -2,6 +2,12 @@
 
 Kept in the shape of [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), versioned by [semver](https://semver.org/spec/v2.0.0.html)
 
+## [Unreleased]
+
+### Changed
+
+- the weekly lock bump renders `theme/theme.conf` again from the new palette and lands both together, so a colour that moved upstream reaches the greeter without a hand and without a pull request. `palette-drift.yml`, which opened that pull request, is removed
+
 ## [1.2.0] - 2026-10-09
 
 ### Added

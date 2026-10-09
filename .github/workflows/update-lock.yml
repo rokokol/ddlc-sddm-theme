@@ -2,7 +2,10 @@ name: update-lock
 
 # flake.lock ages on its own and nothing else here moves it: dependabot watches only the uses:
 # pins. This takes every input's current revision weekly, runs the very same checks a push runs
-# — build.yml itself, not a copy of its commands — and lands the bump only if they pass
+# — build.yml itself, not a copy of its commands — and lands the bump only if they pass.
+# theme/theme.conf is rendered from the locked palette, so the bump renders it again and
+# carries it, or theme-conf-current would hold every bump that moves a colour. A new palette
+# lands this way, with no review
 #
 # 06:00 is the second wave of the family cascade: ddlc-palette takes its own nixpkgs at 05:00,
 # this picks the new palette up an hour later, and huix takes every sibling at 07:00 — so a
@@ -41,11 +44,14 @@ jobs:
             echo "moved=0" >>"$GITHUB_OUTPUT"
             exit 0
           fi
+          nix run .#write-theme-conf
+          git add flake.lock theme/theme.conf
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           branch=flake-lock/$(date -u +%Y-%m-%d)
           git switch -c "$branch"
-          git commit -qam "take every input's current revision"
+          # Whether theme.conf moved, so the commit alone says whether the theme changed
+          git commit -q -m "$(printf "take every input's current revision\n\n%s\n" "$(git diff --cached --stat -- theme/theme.conf)")"
           git push -f origin "$branch"
           echo "branch=$branch" >>"$GITHUB_OUTPUT"
           echo "moved=1" >>"$GITHUB_OUTPUT"
