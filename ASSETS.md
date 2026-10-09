@@ -16,7 +16,7 @@ The following are derived from or contain official DDLC assets:
 
 `theme/assets/noise.png` is a generated grey noise tile and is not a game asset — regenerate it with `magick -size 240x240 xc:gray50 +noise Random -colorspace Gray -depth 8 -strip theme/assets/noise.png`
 
-The `Doki` font family that `theme.conf` asks for is Team Salvato's and is **not** shipped here. Without it the theme sets the same text in the bundled Nunito; see the README for how to point the theme at another font
+The `Doki` font family that `theme.conf` asks for is a font by 538Fonts from 2015, which is not part of the game. It is free for personal use only and is **not** shipped here. Without it the theme sets the same text in the bundled Nunito; see the README for how to point the theme at another font
 
 ## Nunito
 
