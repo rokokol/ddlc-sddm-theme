@@ -20,6 +20,29 @@
         "type": "github"
       }
     },
+    "ddlc-themes": {
+      "inputs": {
+        "ddlc-palette": [
+          "ddlc-palette"
+        ],
+        "nixpkgs": [
+          "nixpkgs"
+        ]
+      },
+      "locked": {
+        "lastModified": 1791583198,
+        "narHash": "sha256-r0ATphkEx11+JpSGNMBhx2268EMTmVbfoC+ay8liPsw=",
+        "owner": "rokokol",
+        "repo": "ddlc-themes",
+        "rev": "b04ff0d3356a9f9045f3691b31e61179d25858f3",
+        "type": "github"
+      },
+      "original": {
+        "owner": "rokokol",
+        "repo": "ddlc-themes",
+        "type": "github"
+      }
+    },
     "nixpkgs": {
       "locked": {
         "lastModified": 1791048980,
@@ -39,6 +62,7 @@
     "root": {
       "inputs": {
         "ddlc-palette": "ddlc-palette",
+        "ddlc-themes": "ddlc-themes",
         "nixpkgs": "nixpkgs"
       }
     }

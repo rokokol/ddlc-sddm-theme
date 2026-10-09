@@ -140,7 +140,7 @@ Everything lives in the `[General]` block of `theme/theme.conf`, read from QML a
 | `accentPink` / `deepPink` | `#DD77BB` / `#BB5599` | borders and accents |
 | `dotColor` | `#FFDBF0` | the dots |
 | `corruptDot` | `#8C1132` | the dots in easter-egg mode |
-| `dotSpacing` / `dotRadius` | `200` / `40` | grid step and dot radius |
+| `dotSpacing` / `dotRadius` | `120` / `24` | the tile of the polka-dot paper, which holds two dots, and their radius; from [ddlc-themes](https://github.com/rokokol/ddlc-themes), like `bgColor` and `dotColor` |
 | `scrollDuration` | `14000` | drift period of the background, ms |
 | `panelColor` / `panelBorder` | `#FFFFFF` / `#FFBDE1` | login panel |
 | `okOutline` | `#BB5599` | outline of the OK button |

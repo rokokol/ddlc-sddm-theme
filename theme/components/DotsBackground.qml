@@ -1,8 +1,10 @@
 import QtQuick
 import QtQuick.Shapes
 
-// The DDLC menu background: a grid of dots (odd rows offset by half a step)
-// crawling diagonally. Movement integrates velocity per frame (FrameAnimation)
+// The DDLC menu background: the polka-dot paper of ddlc-themes, a square tile
+// with a dot at a quarter and at three quarters of it on both axes — so rows
+// half a tile apart, odd rows offset by half a tile — crawling diagonally at
+// 45°, one tile per period. Movement integrates velocity per frame (FrameAnimation)
 // so it can be brought to a smooth halt and accelerated back the other way just
 // as smoothly — which is what the easter-egg mode does
 Item {
@@ -25,7 +27,7 @@ Item {
     readonly property int dotR: parseInt(config.dotRadius) > 0 ? parseInt(config.dotRadius) : 44
     readonly property int scrollMs: parseInt(config.scrollDuration) > 0 ? parseInt(config.scrollDuration) : 14000
     readonly property int cols: Math.ceil(width / step) + 3
-    readonly property int rows: Math.ceil(height / step) + 5
+    readonly property int rows: Math.ceil(height / (step / 2)) + 5
 
     // Base speed (px/s) at vel = 1; vel is the multiplier and the direction sign
     readonly property real baseVel: step * 1000 / scrollMs
@@ -81,9 +83,9 @@ Item {
     Item {
         id: field
 
-        // x repeats with period step, y with 2·step — the rows are offset
+        // Both axes repeat with period step: two rows, the second offset, make a tile
         x: bg.wrapMod(bg.pos, bg.step) - bg.step
-        y: bg.wrapMod(bg.pos * 2, bg.step * 2) - bg.step * 2
+        y: bg.wrapMod(bg.pos, bg.step) - bg.step
 
         Repeater {
             model: bg.cols * bg.rows
@@ -121,7 +123,7 @@ Item {
                 }
 
                 x: col * bg.step + (row % 2 === 1 ? bg.step / 2 : 0) - bg.step
-                y: row * bg.step - bg.step * 2
+                y: row * bg.step / 2 - bg.step
                 width: bg.dotR * 2
                 height: bg.dotR * 2
                 // GeometryRenderer over CurveRenderer: the contour is straight

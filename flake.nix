@@ -6,6 +6,10 @@
     # Only the checks read it — theme.conf keeps literal hex so the theme installs without Nix
     ddlc-palette.url = "github:rokokol/ddlc-palette";
     ddlc-palette.inputs.nixpkgs.follows = "nixpkgs";
+    # The polka-dot paper every DDLC surface shares: its grid and its two colours
+    ddlc-themes.url = "github:rokokol/ddlc-themes";
+    ddlc-themes.inputs.nixpkgs.follows = "nixpkgs";
+    ddlc-themes.inputs.ddlc-palette.follows = "ddlc-palette";
   };
 
   outputs =
@@ -13,6 +17,7 @@
       self,
       nixpkgs,
       ddlc-palette,
+      ddlc-themes,
     }:
     let
       systems = [
@@ -24,6 +29,7 @@
       themeConf = import ./nix/theme-conf.nix {
         inherit (nixpkgs) lib;
         ddlc = ddlc-palette.lib;
+        roles = builtins.fromJSON (builtins.readFile ddlc-themes.lib.roles);
       };
 
       # Each piece isolated, so a README edit doesn't rebuild anything

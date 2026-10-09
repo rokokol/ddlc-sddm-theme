@@ -6,6 +6,8 @@ Kept in the shape of [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), v
 
 ### Changed
 
+- the background is the polka-dot paper of [ddlc-themes](https://github.com/rokokol/ddlc-themes), the one the Obsidian and rofi themes draw: a 120px tile with two dots of radius 24, rows half a tile apart, drifting at 45°. It was a sparser grid of 200 and 40 with rows a whole step apart. `bgColor`, `dotColor`, `dotSpacing` and `dotRadius` now come from there
+
 - the weekly lock bump renders `theme/theme.conf` again from the new palette and lands both together, so a colour that moved upstream reaches the greeter without a hand and without a pull request. `palette-drift.yml`, which opened that pull request, is removed
 
 ## [1.2.0] - 2026-10-09
