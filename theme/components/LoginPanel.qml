@@ -68,7 +68,7 @@ Item {
             horizontalAlignment: Text.AlignHCenter
             text: panel.errorText
             visible: panel.errorText !== ""
-            Component.onCompleted: Typography.apply(this, "body")
+            Component.onCompleted: Typography.apply(this)
             font.pixelSize: 15
             color: config.errorRed
             wrapMode: Text.WordWrap

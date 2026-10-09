@@ -120,10 +120,10 @@ Nothing has to be built: the theme and the cursors are committed ready to use, s
 
 ## Fonts
 
-The theme sets its text in three families:
+The theme sets its text in two families, and the power glyphs in a third:
 
-- `font=Doki` — the game's font, Team Salvato's, for the clock, the OK button and the glitch text. It is **not** shipped. When it is installed the theme uses it as it is. When it is not, the same text is set in the bundled Nunito at its heaviest weight. Any other installed family works in its place
-- `bodyFont=Nunito` — the fields, the session list and the messages, in the medium weight. It is bundled with the theme under its own licence, so a login screen that has no session fonts still reads well
+- `font=Doki` — a font by 538Fonts that is not part of the game, free for personal use only, for all the text. It is **not** shipped. When it is installed the theme uses it as it is. When it is not, the same text is set in the bundled Nunito at its heaviest weight. Any other installed family works in its place
+- Nunito — the fallback for `font`. It is bundled with the theme under its own licence, so a login screen that has no session fonts still reads well
 - `iconFont=DepartureMono Nerd Font` — only the three power glyphs in the bottom right corner come from it. It is not shipped. Without a Nerd Font they render as boxes, so point this at whichever one you have
 
 The weights of the bundled Nunito need a Qt that has the `font.variableAxes` property. On an older Qt the text still shows, in the font's lightest weight
@@ -134,8 +134,7 @@ Everything lives in the `[General]` block of `theme/theme.conf`, read from QML a
 
 | key | default | what it does |
 | --- | --- | --- |
-| `font` | `Doki` | font family of the clock, the OK button and the glitch text, used when installed, and the bundled Nunito otherwise |
-| `bodyFont` | `Nunito` | font family of the fields, the session list and the messages |
+| `font` | `Doki` | font family of all the text, used when installed, and the bundled Nunito otherwise |
 | `iconFont` | `DepartureMono Nerd Font` | glyphs on the power buttons |
 | `bgColor` | `#FFFFFF` | background |
 | `accentPink` / `deepPink` | `#DD77BB` / `#BB5599` | borders and accents |

@@ -34,7 +34,6 @@ let
   # Everything the palette has no opinion about
   own = {
     font = "Doki";
-    bodyFont = "Nunito";
     iconFont = "DepartureMono Nerd Font";
     # Outline under the corrupted text: the palette's black at a quarter, in Qt's own spelling
     corruptOutline = ddlc.argb.ink "0.25";
@@ -49,7 +48,6 @@ let
   # Order is deliberate: fonts, then colours, then geometry and behaviour
   lines = [
     (render "font" own.font)
-    (render "bodyFont" own.bodyFont)
     (render "iconFont" own.iconFont)
   ]
   ++ lib.mapAttrsToList (k: name: render k palette.${name}) colours

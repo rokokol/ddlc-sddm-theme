@@ -109,7 +109,7 @@ Item {
         anchors.horizontalCenter: parent.horizontalCenter
         y: parent.height * 0.24
         text: pool[0]
-        Component.onCompleted: Typography.apply(corrupt, "display")
+        Component.onCompleted: Typography.apply(corrupt)
         font.pixelSize: 26
         opacity: 0.75
         color: config.deepPink

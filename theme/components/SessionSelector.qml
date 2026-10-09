@@ -12,7 +12,7 @@ ComboBox {
     textRole: "name"
     width: 190
     height: 44
-    Component.onCompleted: Typography.apply(control, "body")
+    Component.onCompleted: Typography.apply(control)
     font.pixelSize: 15
 
     background: Rectangle {
@@ -50,7 +50,7 @@ ComboBox {
         contentItem: Text {
             leftPadding: 8
             text: model.name
-            Component.onCompleted: Typography.apply(this, "body")
+            Component.onCompleted: Typography.apply(this)
             font.pixelSize: 15
             color: config.textDark
             verticalAlignment: Text.AlignVCenter

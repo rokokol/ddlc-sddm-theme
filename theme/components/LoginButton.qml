@@ -30,7 +30,7 @@ Item {
             x: (btn.width - implicitWidth) / 2 + modelData[0]
             y: (btn.height - implicitHeight) / 2 + modelData[1]
             text: btn.label
-            Component.onCompleted: Typography.apply(this, "display")
+            Component.onCompleted: Typography.apply(this)
             font.pixelSize: 36
             font.letterSpacing: 6
             color: btn.outline
@@ -42,7 +42,7 @@ Item {
 
         anchors.centerIn: parent
         text: btn.label
-        Component.onCompleted: Typography.apply(okText, "display")
+        Component.onCompleted: Typography.apply(okText)
         font.pixelSize: 36
         font.letterSpacing: 6
         color: config.textLight

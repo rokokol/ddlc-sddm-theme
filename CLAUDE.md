@@ -45,7 +45,7 @@ It comes from `ddlc-palette`, never a literal here. Edit the mapping in `nix/the
 
 ## Fonts
 
-Text gets its family and weight from `Typography.apply(item, "display"|"body")` in `theme/fonts/Typography.qml`, never from a `font.family` in a component: QML does not fall back from a missing named family, so the Doki-or-Nunito choice has to be made in one place. Do not set `font.bold` on display text — Doki has no bold file and Qt would smear it. The Nunito files are vendored through `.github/vendor.lock`, never edited in place
+Text gets its family and weight from `Typography.apply(item)` in `theme/fonts/Typography.qml`, never from a `font.family` in a component: QML does not fall back from a missing named family, so the Doki-or-Nunito choice has to be made in one place. All text is Doki when it is installed and Nunito Black when it is not. Do not set `font.bold` — Doki has no bold file and Qt would smear it. The Nunito files are vendored through `.github/vendor.lock`, never edited in place
 
 ## The module is checked twice
 

@@ -6,8 +6,7 @@ Kept in the shape of [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), v
 
 ### Changed
 
-- the clock, the OK button and the glitch text keep the `Doki` font when it is installed, and use the bundled Nunito at weight Black when it is not. The OK button no longer asks for a bold face, so Doki is not smeared
-- the fields, the session list, the layout label and the error line use Nunito at weight Medium, set by the new `bodyFont` key in `theme.conf`
+- all text keeps the `Doki` font when it is installed, and uses the bundled Nunito at weight Black when it is not. The OK button no longer asks for a bold face, so Doki is not smeared
 
 ### Added
 

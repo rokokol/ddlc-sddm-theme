@@ -56,7 +56,7 @@ Rectangle {
         anchors.horizontalCenter: parent.horizontalCenter
         anchors.top: parent.top
         anchors.topMargin: 30
-        Component.onCompleted: Typography.apply(clockText, "display")
+        Component.onCompleted: Typography.apply(clockText)
         font.pixelSize: 44
         color: config.deepPink
         text: Qt.formatTime(new Date(), "hh:mm")
@@ -128,7 +128,7 @@ Rectangle {
                 id: layoutLabel
 
                 anchors.centerIn: parent
-                Component.onCompleted: Typography.apply(layoutLabel, "body")
+                Component.onCompleted: Typography.apply(layoutLabel)
                 font.pixelSize: 14
                 color: layoutArea.containsMouse ? config.textLight : config.deepPink
                 text: parent.hasLayouts

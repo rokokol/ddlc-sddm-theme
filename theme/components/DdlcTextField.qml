@@ -17,7 +17,7 @@ TextField {
     }
     height: Math.ceil(fm.height) + topPadding + bottomPadding
 
-    Component.onCompleted: Typography.apply(field, "body")
+    Component.onCompleted: Typography.apply(field)
     font.pixelSize: 19
     color: config.textDark
     placeholderTextColor: config.placeholderColor
