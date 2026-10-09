@@ -1,5 +1,6 @@
 import QtQuick
 import QtQuick.Controls.Basic
+import "../fonts"
 
 // Login panel: a pale pink box with a border in the style of just-monika-ok.png,
 // the username/password fields and the "Just Monika. OK" image button
@@ -67,7 +68,7 @@ Item {
             horizontalAlignment: Text.AlignHCenter
             text: panel.errorText
             visible: panel.errorText !== ""
-            font.family: config.font
+            Component.onCompleted: Typography.apply(this, "body")
             font.pixelSize: 15
             color: config.errorRed
             wrapMode: Text.WordWrap

@@ -27,7 +27,7 @@ There is no behaviour suite for the theme itself: it is QML the greeter runs, an
 ## Layout
 
 ```
-theme/          Main.qml, theme.conf, metadata.desktop, components/, assets/ — copy it anywhere
+theme/          Main.qml, theme.conf, metadata.desktop, components/, assets/, fonts/ — copy it anywhere
 cursors/        the prebuilt XCursor theme, its frames and the script that rebuilds one from the other
 nix/            theme.nix, cursors.nix, module.nix, module-test.nix, nixos-eval.nix
 install.sh      for systems without Nix, VERSION its one source of version
@@ -42,6 +42,10 @@ QML file names are CamelCase because in QML the file name *is* the type name —
 ## Changing a colour
 
 It comes from `ddlc-palette`, never a literal here. Edit the mapping in `nix/theme-conf.nix`, run `nix run .#write-theme-conf`, commit both
+
+## Fonts
+
+Text gets its family and weight from `Typography.apply(item, "display"|"body")` in `theme/fonts/Typography.qml`, never from a `font.family` in a component: QML does not fall back from a missing named family, so the Doki-or-Nunito choice has to be made in one place. Do not set `font.bold` on display text — Doki has no bold file and Qt would smear it. The Nunito files are vendored through `.github/vendor.lock`, never edited in place
 
 ## The module is checked twice
 

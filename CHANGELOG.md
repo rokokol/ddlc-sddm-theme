@@ -2,6 +2,17 @@
 
 Kept in the shape of [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), versioned by [semver](https://semver.org/spec/v2.0.0.html)
 
+## [Unreleased]
+
+### Changed
+
+- the clock, the OK button and the glitch text keep the `Doki` font when it is installed, and use the bundled Nunito at weight Black when it is not. The OK button no longer asks for a bold face, so Doki is not smeared
+- the fields, the session list, the layout label and the error line use Nunito at weight Medium, set by the new `bodyFont` key in `theme.conf`
+
+### Added
+
+- the Nunito variable font, under the SIL Open Font License 1.1, in `theme/fonts/`, so the greeter does not depend on the fonts of a user session. `ASSETS.md` names its licence and source
+
 ## [1.1.1] - 2026-09-21
 
 ### Changed

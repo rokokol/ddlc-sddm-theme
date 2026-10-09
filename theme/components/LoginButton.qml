@@ -1,4 +1,5 @@
 import QtQuick
+import "../fonts"
 
 // Login button: the text "OK" with a thick purple outline on a transparent
 // background, like the button in the game. The outline is eight offset copies of
@@ -29,9 +30,8 @@ Item {
             x: (btn.width - implicitWidth) / 2 + modelData[0]
             y: (btn.height - implicitHeight) / 2 + modelData[1]
             text: btn.label
-            font.family: config.font
+            Component.onCompleted: Typography.apply(this, "display")
             font.pixelSize: 36
-            font.bold: true
             font.letterSpacing: 6
             color: btn.outline
         }
@@ -42,9 +42,8 @@ Item {
 
         anchors.centerIn: parent
         text: btn.label
-        font.family: config.font
+        Component.onCompleted: Typography.apply(okText, "display")
         font.pixelSize: 36
-        font.bold: true
         font.letterSpacing: 6
         color: config.textLight
     }

@@ -1,5 +1,6 @@
 import QtQuick
 import QtQuick.Controls.Basic
+import "../fonts"
 
 // Session picker in the bottom left corner. The list opens upwards so it
 // doesn't run off the screen
@@ -11,7 +12,7 @@ ComboBox {
     textRole: "name"
     width: 190
     height: 44
-    font.family: config.font
+    Component.onCompleted: Typography.apply(control, "body")
     font.pixelSize: 15
 
     background: Rectangle {
@@ -49,7 +50,7 @@ ComboBox {
         contentItem: Text {
             leftPadding: 8
             text: model.name
-            font.family: config.font
+            Component.onCompleted: Typography.apply(this, "body")
             font.pixelSize: 15
             color: config.textDark
             verticalAlignment: Text.AlignVCenter

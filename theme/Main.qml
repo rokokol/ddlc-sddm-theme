@@ -1,5 +1,6 @@
 import QtQuick
 import "components"
+import "fonts"
 
 // SDDM theme in the style of Doki Doki Literature Club.
 // Layers bottom to top: dot background → easter-egg darkening → clock →
@@ -55,7 +56,7 @@ Rectangle {
         anchors.horizontalCenter: parent.horizontalCenter
         anchors.top: parent.top
         anchors.topMargin: 30
-        font.family: config.font
+        Component.onCompleted: Typography.apply(clockText, "display")
         font.pixelSize: 44
         color: config.deepPink
         text: Qt.formatTime(new Date(), "hh:mm")
@@ -124,8 +125,10 @@ Rectangle {
             }
 
             Text {
+                id: layoutLabel
+
                 anchors.centerIn: parent
-                font.family: config.font
+                Component.onCompleted: Typography.apply(layoutLabel, "body")
                 font.pixelSize: 14
                 color: layoutArea.containsMouse ? config.textLight : config.deepPink
                 text: parent.hasLayouts

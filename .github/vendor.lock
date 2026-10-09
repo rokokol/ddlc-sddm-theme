@@ -11,3 +11,5 @@ check-pins.sh rokokol/ci-skill templates/check-pins.sh 1e036e65e3284369fdec3607f
 .github/workflows/distro-fedora.yml rokokol/huix-standard-skill templates/github/workflows/distro-fedora.yml 7ac14ee112b9cf7e4228fae586d83eb1bb772922 c8aece5f31635fc95c889addd5a8ceace2eae582 manual
 .github/workflows/vendor-sync.yml rokokol/ci-skill templates/github/workflows/vendor-sync.yml d55020ab3ca780ea6299336d923b8a3fcb8f491d a5bde77f98d55a43b2c993f4c96a952e0b68010d manual
 check-sh.sh rokokol/bash-best-practices-skill check-sh.sh a4f5f26191417564d0ebe122bf652dd7e3f74b50 37cb4b54dc245288c711b9665c9b4aedc496b1ce
+theme/fonts/Nunito-wght.ttf googlefonts/nunito fonts/variable/Nunito[wght].ttf 8c6a9bb9732545b9ed53f29ec5e1ab0ff53c4e6f 2ec1f4b0676c83ef33049db87b311171699e9192
+theme/fonts/Nunito-LICENSE.txt googlefonts/nunito OFL.txt 8c6a9bb9732545b9ed53f29ec5e1ab0ff53c4e6f c8210f08ca3cece05b4f7baa428afe8e1abe3293

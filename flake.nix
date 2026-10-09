@@ -119,7 +119,7 @@
           # The theme must stay copy-installable: everything the QML references has to be inside it
           theme-is-self-contained = pkgs.runCommand "theme-is-self-contained" { } ''
             theme=${sddm-ddlc-theme}/share/sddm/themes/ddlc
-            for f in Main.qml theme.conf metadata.desktop assets/noise.png assets/just-monika-ok.png; do
+            for f in Main.qml theme.conf metadata.desktop assets/noise.png assets/just-monika-ok.png fonts/qmldir fonts/Typography.qml fonts/Nunito-wght.ttf fonts/Nunito-LICENSE.txt; do
               test -e "$theme/$f" || { echo "missing $f"; exit 1; }
             done
             test "$(ls "$theme"/assets/*-sticker-*.png | wc -l)" -eq 12

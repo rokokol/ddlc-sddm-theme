@@ -1,5 +1,6 @@
 import QtQuick
 import QtQuick.Controls.Basic
+import "../fonts"
 
 // A DDLC-style input: a white "pill" with a pink border that darkens on focus
 TextField {
@@ -16,7 +17,7 @@ TextField {
     }
     height: Math.ceil(fm.height) + topPadding + bottomPadding
 
-    font.family: config.font
+    Component.onCompleted: Typography.apply(field, "body")
     font.pixelSize: 19
     color: config.textDark
     placeholderTextColor: config.placeholderColor

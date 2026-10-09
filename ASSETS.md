@@ -16,7 +16,11 @@ The following are derived from or contain official DDLC assets:
 
 `theme/assets/noise.png` is a generated grey noise tile and is not a game asset — regenerate it with `magick -size 240x240 xc:gray50 +noise Random -colorspace Gray -depth 8 -strip theme/assets/noise.png`
 
-The `Doki` font family that `theme.conf` asks for is Team Salvato's and is **not** shipped here. Without it Qt falls back to its default sans; see the README for how to point the theme at another font
+The `Doki` font family that `theme.conf` asks for is Team Salvato's and is **not** shipped here. Without it the theme sets the same text in the bundled Nunito; see the README for how to point the theme at another font
+
+## Nunito
+
+`theme/fonts/Nunito-wght.ttf` is the variable Nunito font from [googlefonts/nunito](https://github.com/googlefonts/nunito), copyright The Nunito Project Authors, under the SIL Open Font License 1.1 — the licence text is `theme/fonts/Nunito-LICENSE.txt`. It is not covered by the MIT licence of the code. The OFL lets a font travel with a program, so it is bundled: a login screen runs before the user's session, and cannot rely on the fonts installed for it. Both files are copied unchanged by `vendor-sync.sh`, and `.github/vendor.lock` names the commit they come from
 
 Use here follows [Team Salvato's IP guidelines](https://teamsalvato.com/ip-guidelines): this is non-commercial fan content, nothing containing official assets is sold, and no claim of affiliation is made. If you reuse any of it, the same conditions apply to you
 

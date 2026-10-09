@@ -1,4 +1,5 @@
 import QtQuick
+import "../fonts"
 
 // Wrong-password glitch: the panel shakes, RGB-split, random scanlines and
 // flickering corrupted text. All of it dies out after ~0.8 s
@@ -108,7 +109,7 @@ Item {
         anchors.horizontalCenter: parent.horizontalCenter
         y: parent.height * 0.24
         text: pool[0]
-        font.family: config.font
+        Component.onCompleted: Typography.apply(corrupt, "display")
         font.pixelSize: 26
         opacity: 0.75
         color: config.deepPink
