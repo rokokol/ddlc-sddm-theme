@@ -2,15 +2,15 @@
 
 Kept in the shape of [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), versioned by [semver](https://semver.org/spec/v2.0.0.html)
 
-## [Unreleased]
-
-### Changed
-
-- all text keeps the `Doki` font when it is installed, and uses the bundled Nunito at weight Black when it is not. The OK button no longer asks for a bold face, so Doki is not smeared
+## [1.2.0] - 2026-10-09
 
 ### Added
 
 - the Nunito variable font, under the SIL Open Font License 1.1, in `theme/fonts/`, so the greeter does not depend on the fonts of a user session. `ASSETS.md` names its licence and source
+
+### Changed
+
+- all text keeps the `Doki` font when it is installed, and uses the bundled Nunito at weight Black when it is not. The OK button no longer asks for a bold face, so Doki is not smeared
 
 ## [1.1.1] - 2026-09-21
 
