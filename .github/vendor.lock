@@ -13,3 +13,4 @@ check-pins.sh rokokol/ci-skill templates/check-pins.sh 1e036e65e3284369fdec3607f
 check-sh.sh rokokol/bash-best-practices-skill check-sh.sh a4f5f26191417564d0ebe122bf652dd7e3f74b50 37cb4b54dc245288c711b9665c9b4aedc496b1ce
 theme/fonts/Nunito-wght.ttf googlefonts/nunito fonts/variable/Nunito[wght].ttf 8c6a9bb9732545b9ed53f29ec5e1ab0ff53c4e6f 2ec1f4b0676c83ef33049db87b311171699e9192
 theme/fonts/Nunito-LICENSE.txt googlefonts/nunito OFL.txt 8c6a9bb9732545b9ed53f29ec5e1ab0ff53c4e6f c8210f08ca3cece05b4f7baa428afe8e1abe3293
+.github/workflows/flakehub-publish.yml rokokol/ci-skill templates/github/workflows/flakehub-publish.yml 0460ab59ee4d9a4f490641c95aa0db16ef5f24ac 407d7ebc264a8fe16ee2aa2fe2f31863255f3de7 manual
