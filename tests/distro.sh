@@ -35,7 +35,7 @@ declare -A IMAGE=(
 declare -A BOOTSTRAP=(
   [debian]='apt-get update -qq && apt-get install -y -qq bash'
   [ubuntu]='apt-get update -qq && apt-get install -y -qq bash'
-  [arch]='pacman -Sy --noconfirm --needed bash'
+  [arch]='pacman -Syu --noconfirm --needed bash'
   [fedora]='dnf install -y -q bash'
 )
 
